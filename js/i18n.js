@@ -10,7 +10,7 @@
   window.App = window.App || {};
 
   var STORAGE_KEY = 'nbstarry_lang';
-  var currentLang = 'en';
+  var currentLang = 'zh';
 
   var translations = {
     en: {
@@ -30,9 +30,9 @@
 
       // About
       'about.title': 'About Me',
-      'about.p1':    'I\'m <strong>Starry Bei</strong>, a developer and researcher who <strong>graduated from Shanghai Jiao Tong University</strong>, working at the intersection of game development, artificial intelligence, and biology.',
+      'about.p1':    'I\'m <strong>Starry Bei</strong>, working at the intersection of game development, artificial intelligence, and biology.',
       'about.p2':    'My work spans AI, gaming, and biology. I believe the most interesting discoveries happen when different fields collide.',
-      'about.tag.school': 'SJTU',
+      'about.tag.school': 'ECNU & SJTU',
       'about.tag.loc':    'Shanghai, China',
       'about.tag.field':  'AI + Game + Biology',
 
@@ -65,7 +65,7 @@
       'footer.copyright': '© 2024 — 2026 Starry Bei. Built with vanilla HTML, CSS & JS.',
 
       // 404
-      '404.message':  'Page not found in this universe.',
+      '404.message':  'Page not found in this starry sky.',
       '404.back':     'Back to Homepage',
 
       // Blog pages
@@ -126,7 +126,7 @@
       'footer.copyright': '© 2024 — 2026 Starry Bei. 使用原生 HTML、CSS 和 JS 构建。',
 
       // 404
-      '404.message':  '这个页面不在此宇宙中。',
+      '404.message':  '这个页面不在此星空中。',
       '404.back':     '返回主页',
 
       // Blog pages
@@ -147,8 +147,8 @@
     var saved = localStorage.getItem(STORAGE_KEY);
     if (saved && (saved === 'en' || saved === 'zh')) return saved;
 
-    var browserLang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-    return browserLang.startsWith('zh') ? 'zh' : 'en';
+    var browserLang = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
+    return browserLang.startsWith('en') ? 'en' : 'zh';
   }
 
   function applyTranslations(lang) {
