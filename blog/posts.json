@@ -1,0 +1,13 @@
+{
+  "posts": [
+    {
+      "title": "Hello World — Welcome to My Blog",
+      "title_zh": "Hello World — 欢迎来到我的博客",
+      "slug": "hello-world",
+      "date": "2026-02-06",
+      "tags": ["Meta", "Life"],
+      "excerpt": "Welcome to my new personal homepage and blog. A fresh start for sharing thoughts on game development, AI research, and everything in between.",
+      "excerpt_zh": "欢迎来到我全新的个人主页和博客。一个分享游戏开发、AI 研究以及生活点滴的新起点。"
+    }
+  ]
+}

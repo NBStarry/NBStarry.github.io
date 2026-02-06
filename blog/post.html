@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Post — Starry Bei</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/blog.css">
+
+  <!-- marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+  <script src="/js/i18n.js" defer></script>
+  <script src="/js/nav.js" defer></script>
+  <script src="/js/blog-loader.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (App.I18n) App.I18n.init();
+      if (App.Nav) App.Nav.init();
+      if (App.BlogLoader) App.BlogLoader.initPost();
+    });
+  </script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar--scrolled" id="navbar">
+    <div class="container navbar__inner">
+      <a href="/" class="navbar__logo">
+        <span class="navbar__logo-symbol">&gt;_</span> Starry Bei
+      </a>
+      <div class="navbar__right">
+        <button class="lang-toggle" aria-label="Switch language">
+          <span class="lang-toggle__label">中</span>
+        </button>
+        <button class="navbar__toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+        </button>
+      </div>
+      <ul class="navbar__links" id="nav-links">
+        <li><a href="/#about" data-i18n="nav.about">About</a></li>
+        <li><a href="/#projects" data-i18n="nav.projects">Projects</a></li>
+        <li><a href="/blog/" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="/#contact" data-i18n="nav.contact">Contact</a></li>
+        <li>
+          <button class="lang-toggle" aria-label="Switch language">
+            <span class="lang-toggle__label">中</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="navbar__mobile-overlay" id="mobile-menu">
+      <a href="/#about" data-i18n="nav.about">About</a>
+      <a href="/#projects" data-i18n="nav.projects">Projects</a>
+      <a href="/blog/" data-i18n="nav.blog">Blog</a>
+      <a href="/#contact" data-i18n="nav.contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Blog Post Content -->
+  <main class="blog-post">
+    <article class="container container--narrow">
+      <header class="blog-post__header">
+        <a href="/blog/" class="blog-post__back" data-i18n="blog.back_all">← Back to all posts</a>
+        <time class="blog-post__date" id="post-date"></time>
+        <h1 class="blog-post__title" id="post-title">Loading...</h1>
+        <div class="blog-post__tags" id="post-tags"></div>
+      </header>
+      <div class="blog-post__content" id="post-content">
+        <div class="shimmer" style="height:200px;border-radius:12px;"></div>
+      </div>
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer footer--minimal">
+    <div class="container">
+      <a href="/blog/" class="footer__back-link" data-i18n="blog.back_all">← Back to all posts</a>
+      <p class="footer__bottom-text">&copy; 2024 — 2026 Starry Bei</p>
+    </div>
+  </footer>
+
+</body>
+</html>

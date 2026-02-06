@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog — Starry Bei</title>
+  <meta name="description" content="Blog posts by Starry Bei on game development, AI, biology, and more.">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/blog.css">
+
+  <script src="/js/i18n.js" defer></script>
+  <script src="/js/scroll-reveal.js" defer></script>
+  <script src="/js/nav.js" defer></script>
+  <script src="/js/blog-loader.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (App.I18n) App.I18n.init();
+      if (App.Nav) App.Nav.init();
+      if (App.ScrollReveal) App.ScrollReveal.init();
+      if (App.BlogLoader) App.BlogLoader.initIndex('all-posts');
+    });
+  </script>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar--scrolled" id="navbar">
+    <div class="container navbar__inner">
+      <a href="/" class="navbar__logo">
+        <span class="navbar__logo-symbol">&gt;_</span> Starry Bei
+      </a>
+      <div class="navbar__right">
+        <button class="lang-toggle" aria-label="Switch language">
+          <span class="lang-toggle__label">中</span>
+        </button>
+        <button class="navbar__toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+        </button>
+      </div>
+      <ul class="navbar__links" id="nav-links">
+        <li><a href="/#about" data-i18n="nav.about">About</a></li>
+        <li><a href="/#projects" data-i18n="nav.projects">Projects</a></li>
+        <li><a href="/blog/" class="active" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="/#contact" data-i18n="nav.contact">Contact</a></li>
+        <li>
+          <button class="lang-toggle" aria-label="Switch language">
+            <span class="lang-toggle__label">中</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="navbar__mobile-overlay" id="mobile-menu">
+      <a href="/#about" data-i18n="nav.about">About</a>
+      <a href="/#projects" data-i18n="nav.projects">Projects</a>
+      <a href="/blog/" data-i18n="nav.blog">Blog</a>
+      <a href="/#contact" data-i18n="nav.contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- Blog Index -->
+  <main class="blog-index">
+    <div class="container container--narrow">
+      <header class="blog-index__header">
+        <h1 class="section-title" data-i18n="blog.index.title">All Posts</h1>
+        <p class="blog-index__subtitle" data-i18n="blog.index.subtitle">Thoughts on game development, AI, biology, and everything in between.</p>
+      </header>
+      <div class="blog__list" id="all-posts">
+        <div class="shimmer" style="height:150px;border-radius:12px;margin-bottom:1.5rem;"></div>
+        <div class="shimmer" style="height:150px;border-radius:12px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer footer--minimal">
+    <div class="container">
+      <a href="/" class="footer__back-link" data-i18n="blog.back_home">← Back to homepage</a>
+      <p class="footer__bottom-text">&copy; 2024 — 2026 Starry Bei</p>
+    </div>
+  </footer>
+
+</body>
+</html>

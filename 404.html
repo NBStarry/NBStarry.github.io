@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page Not Found</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/animations.css">
+
+  <script src="/js/i18n.js" defer></script>
+  <script src="/js/particles.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (App.I18n) App.I18n.init();
+      if (App.Particles) App.Particles.init('particle-canvas');
+    });
+  </script>
+</head>
+<body>
+  <section class="hero" style="min-height:100vh;">
+    <canvas id="particle-canvas" class="hero__canvas"></canvas>
+    <div class="hero__content">
+      <h1 style="font-size:clamp(5rem,10vw,10rem);font-weight:700;background:var(--gradient-text);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:var(--space-4);">404</h1>
+      <p style="font-family:var(--font-mono);font-size:var(--font-size-xl);color:var(--color-text-secondary);margin-bottom:var(--space-8);">
+        <span data-i18n="404.message">Page not found in this universe.</span>
+      </p>
+      <a href="/" class="btn btn--primary" data-i18n="404.back">Back to Homepage</a>
+    </div>
+  </section>
+</body>
+</html>

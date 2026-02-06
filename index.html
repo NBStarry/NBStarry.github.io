@@ -1,189 +1,306 @@
-<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>StarryBei's Blog</title><meta name="author" content="Starry Bei"><meta name="copyright" content="Starry Bei"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在不断加速的时代中探寻自己的终点">
-<meta property="og:type" content="website">
-<meta property="og:title" content="StarryBei&#39;s Blog">
-<meta property="og:url" content="https://nbstarry.github.io/index.html">
-<meta property="og:site_name" content="StarryBei&#39;s Blog">
-<meta property="og:description" content="在不断加速的时代中探寻自己的终点">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
-<meta property="article:author" content="Starry Bei">
-<meta property="article:tag" content="CV GNN Game Development Biology">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://nbstarry.github.io/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.14.0-b1"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>(()=>{
-      const saveToLocal = {
-        set: (key, value, ttl) => {
-          if (ttl === 0) return
-          const now = Date.now()
-          const expiry = now + ttl * 86400000
-          const item = {
-            value,
-            expiry
-          }
-          localStorage.setItem(key, JSON.stringify(item))
-        },
-      
-        get: key => {
-          const itemStr = localStorage.getItem(key)
-      
-          if (!itemStr) {
-            return undefined
-          }
-          const item = JSON.parse(itemStr)
-          const now = Date.now()
-      
-          if (now > item.expiry) {
-            localStorage.removeItem(key)
-            return undefined
-          }
-          return item.value
-        }
-      }
-      
-      window.btf = {
-        saveToLocal: saveToLocal,
-        getScript: (url, attr = {}) => new Promise((resolve, reject) => {
-          const script = document.createElement('script')
-          script.src = url
-          script.async = true
-          script.onerror = reject
-          script.onload = script.onreadystatechange = function() {
-            const loadState = this.readyState
-            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-            script.onload = script.onreadystatechange = null
-            resolve()
-          }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Starry Bei — Game Dev, AI & Biology</title>
+  <meta name="description" content="Personal homepage of Starry Bei. Game developer, AI researcher, and biology enthusiast at Shanghai Jiao Tong University.">
+  <meta name="author" content="Starry Bei">
 
-          Object.keys(attr).forEach(key => {
-            script.setAttribute(key, attr[key])
-          })
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Starry Bei — Developer & Researcher">
+  <meta property="og:description" content="Game Development, AI, and Biology">
+  <meta property="og:url" content="https://nbstarry.github.io">
 
-          document.head.appendChild(script)
-        }),
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
 
-        getCSS: (url, id = false) => new Promise((resolve, reject) => {
-          const link = document.createElement('link')
-          link.rel = 'stylesheet'
-          link.href = url
-          if (id) link.id = id
-          link.onerror = reject
-          link.onload = link.onreadystatechange = function() {
-            const loadState = this.readyState
-            if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
-            link.onload = link.onreadystatechange = null
-            resolve()
-          }
-          document.head.appendChild(link)
-        }),
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 
-        addGlobalFn: (key, fn, name = false, parent = window) => {
-          const pjaxEnable = false
-          if (!pjaxEnable && key.startsWith('pjax')) return
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
 
-          const globalFn = parent.globalFn || {}
-          const keyObj = globalFn[key] || {}
-    
-          if (name && keyObj[name]) return
-    
-          name = name || Object.keys(keyObj).length
-          keyObj[name] = fn
-          globalFn[key] = keyObj
-          parent.globalFn = globalFn
-        }
-      }
-    
-      const activateDarkMode = () => {
-        document.documentElement.setAttribute('data-theme', 'dark')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
-        }
-      }
-      const activateLightMode = () => {
-        document.documentElement.setAttribute('data-theme', 'light')
-        if (document.querySelector('meta[name="theme-color"]') !== null) {
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
-        }
-      }
+  <!-- Scripts -->
+  <script src="js/i18n.js" defer></script>
+  <script src="js/particles.js" defer></script>
+  <script src="js/typewriter.js" defer></script>
+  <script src="js/scroll-reveal.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/projects.js" defer></script>
+  <script src="js/blog-loader.js" defer></script>
+  <script src="js/main.js" defer></script>
+</head>
+<body>
 
-      btf.activateDarkMode = activateDarkMode
-      btf.activateLightMode = activateLightMode
-      
-      const t = saveToLocal.get('theme')
-    
-        if (t === 'dark') activateDarkMode()
-        else if (t === 'light') activateLightMode()
-      
-      const asideStatus = saveToLocal.get('aside-status')
-      if (asideStatus !== undefined) {
-        if (asideStatus === 'hide') {
-          document.documentElement.classList.add('hide-aside')
-        } else {
-          document.documentElement.classList.remove('hide-aside')
-        }
-      }
-    
-      const detectApple = () => {
-        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
-          document.documentElement.classList.add('apple')
-        }
-      }
-      detectApple()
-    })()</script><script>const GLOBAL_CONFIG = {
-  root: '/',
-  algolia: undefined,
-  localSearch: undefined,
-  translate: undefined,
-  noticeOutdate: undefined,
-  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
-  copy: {
-    success: '复制成功',
-    error: '复制错误',
-    noSupport: '浏览器不支持'
-  },
-  relativeDate: {
-    homepage: false,
-    post: false
-  },
-  runtime: '',
-  dateSuffix: {
-    just: '刚刚',
-    min: '分钟前',
-    hour: '小时前',
-    day: '天前',
-    month: '个月前'
-  },
-  copyright: undefined,
-  lightbox: 'fancybox',
-  Snackbar: undefined,
-  infinitegrid: {
-    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
-    buttonText: '加载更多'
-  },
-  isPhotoFigcaption: false,
-  islazyload: false,
-  isAnchor: false,
-  percent: {
-    toc: true,
-    rightside: false,
-  },
-  autoDarkmode: false
-}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
-  title: 'StarryBei\'s Blog',
-  isPost: false,
-  isHome: true,
-  isHighlightShrink: false,
-  isToc: false,
-  postUpdate: '2024-04-08 22:52:36'
-}</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="full_page" id="page-header"><nav id="nav"><span id="blog-info"><a href="/" title="StarryBei's Blog"><span class="site-name">StarryBei's Blog</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><span class="site-page group"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></span><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="site-info"><h1 id="site-title">StarryBei's Blog</h1></div><div id="scroll-down"><i class="fas fa-angle-down scroll-down-effects"></i></div></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="recent-post-info no-cover"><a class="article-title" href="/2024/04/08/hello-world/" title="Hello World">Hello World</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2024-04-08T13:53:00.154Z" title="发表于 2024-04-08 21:53:00">2024-04-08</time></span></div><div class="content">Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick StartCreate a new post1$ hexo new &quot;My New Post&quot;
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container navbar__inner">
+      <a href="#hero" class="navbar__logo">
+        <span class="navbar__logo-symbol">&gt;_</span> Starry Bei
+      </a>
+      <div class="navbar__right">
+        <button class="lang-toggle" aria-label="Switch language">
+          <span class="lang-toggle__label">中</span>
+        </button>
+        <button class="navbar__toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+          <span class="navbar__toggle-bar"></span>
+        </button>
+      </div>
+      <ul class="navbar__links" id="nav-links">
+        <li><a href="#about" data-i18n="nav.about">About</a></li>
+        <li><a href="#skills" data-i18n="nav.skills">Skills</a></li>
+        <li><a href="#projects" data-i18n="nav.projects">Projects</a></li>
+        <li><a href="#blog" data-i18n="nav.blog">Blog</a></li>
+        <li><a href="#hobbies" data-i18n="nav.hobbies">Hobbies</a></li>
+        <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+        <li>
+          <button class="lang-toggle" aria-label="Switch language">
+            <span class="lang-toggle__label">中</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <!-- Mobile Menu Overlay -->
+    <div class="navbar__mobile-overlay" id="mobile-menu">
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#skills" data-i18n="nav.skills">Skills</a>
+      <a href="#projects" data-i18n="nav.projects">Projects</a>
+      <a href="#blog" data-i18n="nav.blog">Blog</a>
+      <a href="#hobbies" data-i18n="nav.hobbies">Hobbies</a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
+    </div>
+  </nav>
 
-More info: Writing
-Run server1$ hexo server
+  <!-- ===== HERO ===== -->
+  <section id="hero" class="hero">
+    <canvas id="particle-canvas" class="hero__canvas"></canvas>
+    <div class="hero__content">
+      <p class="hero__greeting" data-i18n="hero.greeting">Hello, I'm</p>
+      <h1 class="hero__name">Starry Bei</h1>
+      <p class="hero__tagline">
+        <span
+          data-typewriter="Game Developer & AI Researcher|Bridging Biology and Deep Learning|Building at the edge of code and creativity"
+          data-typewriter-speed="70"
+          data-typewriter-pause="2500"
+          data-typewriter-loop="true"
+        ></span><span class="typewriter-cursor"></span>
+      </p>
+      <div class="hero__cta">
+        <a href="#projects" class="btn btn--primary" data-i18n="hero.cta.work">View My Work</a>
+        <a href="#contact" class="btn btn--ghost" data-i18n="hero.cta.contact">Get In Touch</a>
+      </div>
+      <div class="hero__scroll-hint">
+        <span data-i18n="hero.scroll">Scroll to explore</span>
+        <div class="hero__scroll-arrow"></div>
+      </div>
+    </div>
+  </section>
 
-More info: Server
-Generate static files1$ hexo generate
+  <!-- ===== ABOUT ===== -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="about.title">About Me</h2>
+      <div class="about__grid">
+        <div class="about__image reveal">
+          <img
+            src="https://avatars.githubusercontent.com/u/43176376?v=4&s=400"
+            alt="Starry Bei"
+            class="about__avatar"
+            loading="lazy"
+          >
+        </div>
+        <div class="about__text reveal">
+          <p data-i18n="about.p1">
+            I'm <strong>Starry Bei</strong>, a developer and researcher at
+            <strong>Shanghai Jiao Tong University</strong>, working at the
+            intersection of game development, artificial intelligence, and biology.
+          </p>
+          <p data-i18n="about.p2">
+            My work spans from building explainable graph neural networks for
+            cancer gene analysis to exploring game development and interactive
+            experiences. I believe the most interesting discoveries happen when
+            different fields collide.
+          </p>
+          <div class="about__highlights">
+            <div class="about__highlight-item">
+              <span class="about__highlight-icon">🎓</span>
+              <span data-i18n="about.tag.school">SJTU</span>
+            </div>
+            <div class="about__highlight-item">
+              <span class="about__highlight-icon">📍</span>
+              <span data-i18n="about.tag.loc">Shanghai, China</span>
+            </div>
+            <div class="about__highlight-item">
+              <span class="about__highlight-icon">🔬</span>
+              <span data-i18n="about.tag.field">AI + Biology</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-More info: Generating
-Deploy to remote sites1$ hexo deploy
+  <!-- ===== SKILLS ===== -->
+  <section id="skills" class="section section--alt">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="skills.title">Skills & Technologies</h2>
+      <div class="skills__categories reveal-stagger">
+        <div class="skills__category reveal">
+          <h3 class="skills__category-title" data-i18n="skills.cat.ai">AI / Machine Learning</h3>
+          <div class="skills__tags">
+            <span class="skill-badge">Python</span>
+            <span class="skill-badge">PyTorch</span>
+            <span class="skill-badge">Graph Neural Networks</span>
+            <span class="skill-badge">Transformers</span>
+            <span class="skill-badge">Deep Learning</span>
+            <span class="skill-badge">Bioinformatics</span>
+          </div>
+        </div>
+        <div class="skills__category reveal">
+          <h3 class="skills__category-title" data-i18n="skills.cat.game">Game Development</h3>
+          <div class="skills__tags">
+            <span class="skill-badge">Unity</span>
+            <span class="skill-badge">C#</span>
+            <span class="skill-badge">C++</span>
+            <span class="skill-badge">Game Design</span>
+            <span class="skill-badge">Shader Programming</span>
+          </div>
+        </div>
+        <div class="skills__category reveal">
+          <h3 class="skills__category-title" data-i18n="skills.cat.web">Web & Tools</h3>
+          <div class="skills__tags">
+            <span class="skill-badge">HTML / CSS / JS</span>
+            <span class="skill-badge">Git</span>
+            <span class="skill-badge">Linux</span>
+            <span class="skill-badge">Jupyter</span>
+            <span class="skill-badge">Shell</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-More info: Deployment
-</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Starry Bei</div><div class="author-info__description">在不断加速的时代中探寻自己的终点</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">1</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/04/08/hello-world/" title="Hello World">Hello World</a><time datetime="2024-04-08T13:53:00.154Z" title="发表于 2024-04-08 21:53:00">2024-04-08</time></div></div></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2024/04/"><span class="card-archive-list-date">四月 2024</span><span class="card-archive-list-count">1</span></a></li></ul></div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站资讯</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">1</div></div><div class="webinfo-item"><div class="item-name">本站访客数 :</div><div class="item-count" id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总访问量 :</div><div class="item-count" id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2024-04-08T14:52:36.323Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Starry Bei</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.14.0-b1"></script><script src="/js/main.js?v=4.14.0-b1"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.35/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
+  <!-- ===== PROJECTS ===== -->
+  <section id="projects" class="section">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="projects.title">Projects</h2>
+      <div class="projects__grid reveal-stagger" id="projects-grid">
+        <noscript>
+          <p class="empty-state">Enable JavaScript to see live project data from GitHub.</p>
+        </noscript>
+      </div>
+      <div class="projects__more reveal">
+        <a href="https://github.com/NBStarry" target="_blank" rel="noopener" class="btn btn--ghost" data-i18n="projects.view_all">
+          View All on GitHub →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOG ===== -->
+  <section id="blog" class="section section--alt">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="blog.title">Latest Posts</h2>
+      <div class="blog__list" id="blog-posts">
+        <!-- Dynamically populated by blog-loader.js -->
+      </div>
+      <div class="blog__more reveal">
+        <a href="blog/" class="btn btn--ghost" data-i18n="blog.view_all">View All Posts →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOBBIES ===== -->
+  <section id="hobbies" class="section">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="hobbies.title">Interests & Hobbies</h2>
+      <div class="hobbies__grid reveal-stagger">
+
+        <div class="hobby-card reveal">
+          <div class="hobby-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 11V7a6 6 0 0 1 12 0v4"/>
+              <rect x="2" y="11" width="20" height="11" rx="3"/>
+              <path d="M8 15h.01M12 15h.01M16 15h.01"/>
+              <path d="M7 19l2-2m6 2l2-2"/>
+            </svg>
+          </div>
+          <h3 class="hobby-card__title" data-i18n="hobbies.gaming.title">Gaming</h3>
+          <p class="hobby-card__description" data-i18n="hobbies.gaming.desc">
+            Passionate about game design and interactive storytelling.
+            From AAA titles to indie gems, games are where art meets technology.
+          </p>
+        </div>
+
+        <div class="hobby-card reveal">
+          <div class="hobby-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a8 8 0 0 0-8 8c0 3.4 2.1 6.3 5 7.5V20h6v-2.5c2.9-1.2 5-4.1 5-7.5a8 8 0 0 0-8-8z"/>
+              <path d="M9 22h6"/>
+              <path d="M10 2v4M14 2v4M8 8h8"/>
+              <circle cx="9" cy="12" r="1"/>
+              <circle cx="15" cy="12" r="1"/>
+            </svg>
+          </div>
+          <h3 class="hobby-card__title" data-i18n="hobbies.ai.title">Artificial Intelligence</h3>
+          <p class="hobby-card__description" data-i18n="hobbies.ai.desc">
+            Fascinated by how machines learn. From graph neural networks
+            to generative models, AI is reshaping every field I care about.
+          </p>
+        </div>
+
+        <div class="hobby-card reveal">
+          <div class="hobby-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C8 6 4 9 4 13a8 8 0 0 0 16 0c0-4-4-7-8-11z"/>
+              <path d="M9 17c0-2 1.5-3 3-3s3 1 3 3"/>
+              <circle cx="10" cy="12" r="0.5"/>
+              <circle cx="14" cy="12" r="0.5"/>
+            </svg>
+          </div>
+          <h3 class="hobby-card__title" data-i18n="hobbies.bio.title">Biology & Bioinformatics</h3>
+          <p class="hobby-card__description" data-i18n="hobbies.bio.desc">
+            Understanding life at the molecular level. Applying computational
+            methods to decode the complexity of biological systems.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT / FOOTER ===== -->
+  <footer id="contact" class="footer">
+    <div class="container">
+      <h2 class="section-title reveal" data-i18n="contact.title">Get In Touch</h2>
+      <p class="footer__subtitle reveal" data-i18n="contact.subtitle">
+        Interested in collaborating or just want to say hi?
+      </p>
+      <div class="footer__links reveal">
+        <a href="https://github.com/NBStarry" target="_blank" rel="noopener" class="footer__link" aria-label="GitHub">
+          <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+        <a href="mailto:starrybei@qq.com" class="footer__link" aria-label="Email">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          <span>Email</span>
+        </a>
+      </div>
+      <div class="footer__bottom">
+        <p data-i18n="footer.copyright">&copy; 2024 — 2026 Starry Bei. Built with vanilla HTML, CSS & JS.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
