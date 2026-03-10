@@ -705,9 +705,11 @@ body {
 .drawer.on { transform: translateX(0); }
 .drawer-hd {
   display: flex; align-items: center; gap: 14px;
-  padding: 16px 22px 20px;
+  padding: 60px 22px 20px;               /* 60px top = safe area + spacing */
   border-bottom: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
 }
+.drawer-hd:active { background: rgba(255,255,255,0.02); }
 .drawer-av {
   width: 44px; height: 44px; border-radius: 50%;
   background: rgba(100,80,200,0.15);
@@ -769,9 +771,9 @@ body {
   <!-- Drawer -->
   <div class="drawer-overlay" id="drawerOv" onclick="closeDrawer()"></div>
   <div class="drawer" id="drawer">
-    <div class="drawer-hd">
-      <div class="drawer-av">G</div>
-      <div><div class="drawer-user">GoClaw 用户</div><div class="drawer-email">user@example.com</div></div>
+    <div class="drawer-hd" onclick="drawerNav('profile')">
+      <div class="drawer-av" id="drawerAvatar">G</div>
+      <div><div class="drawer-user" id="drawerUserName">GoClaw 用户</div><div class="drawer-email" id="drawerUserEmail">user@example.com</div></div>
     </div>
     <div class="drawer-body">
       <div class="drawer-sect">
@@ -780,17 +782,14 @@ body {
       <div class="drawer-sect">
         <div class="drawer-sect-tt">功能</div>
         <div class="drawer-item" onclick="drawerNav('skill')"><div class="drawer-item-ic">📦</div><div class="drawer-item-nm">技能商城</div></div>
-        <div class="drawer-item" onclick="drawerNav('device')"><div class="drawer-item-ic">📱</div><div class="drawer-item-nm">设备管理</div></div>
-
+        <div class="drawer-item" onclick="drawerNav('device')"><div class="drawer-item-ic">🖥️</div><div class="drawer-item-nm">设备管理</div></div>
       </div>
       <div class="drawer-sect">
         <div class="drawer-sect-tt">账户</div>
         <div class="drawer-item" onclick="drawerNav('email-cfg')"><div class="drawer-item-ic">📧</div><div class="drawer-item-nm">邮箱配置</div></div>
         <div class="drawer-item" onclick="drawerNav('sub')"><div class="drawer-item-ic">💎</div><div class="drawer-item-nm">订阅管理</div></div>
-        <div class="drawer-item" onclick="toast('⚙️ 设置功能开发中')"><div class="drawer-item-ic">⚙️</div><div class="drawer-item-nm">设置</div></div>
       </div>
     </div>
-    <div class="drawer-ft" onclick="drawerNav('profile')"><div class="drawer-item-ic">👤</div><div class="drawer-item-nm">我的</div></div>
   </div>
 
   <!-- Voice Overlay -->
@@ -982,17 +981,31 @@ body {
     <div class="aurora purple"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">我的</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">个人主页</div><div style="width:44px"></div></div>
       <div class="screen-body">
-        <div class="pf-av">🦞</div>
-        <div class="pf-nm">GoClaw 用户</div>
-        <div class="pf-plan">免费版 · 今日剩余 28%</div>
+        <div style="display:flex;flex-direction:column;align-items:center;padding:24px 20px 0;">
+          <!-- Avatar (click to change) -->
+          <div class="pf-av" id="pfAvatar" onclick="changeAvatar()" style="cursor:pointer;position:relative;">
+            🦞
+            <div style="position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:rgba(100,80,200,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;">📷</div>
+          </div>
+          <input type="file" id="avatarInput" accept="image/*" style="display:none" onchange="handleAvatarChange(this)">
+          <!-- Nickname (click to edit) -->
+          <div class="pf-nm" id="pfNickname" onclick="editNickname()" style="cursor:pointer;display:flex;align-items:center;gap:6px;margin-top:16px;">
+            <span id="pfNickText">GoClaw 用户</span>
+            <span style="font-size:14px;color:rgba(255,255,255,0.2);">✏️</span>
+          </div>
+          <div class="pf-plan">免费版 · 今日剩余 28%</div>
+        </div>
         <div class="pf-menu">
           <div class="pf-item" onclick="nav('sub')"><div class="pf-item-ic" style="background:rgba(100,80,200,0.06)">💎</div><div class="pf-item-nm">订阅管理</div><span class="pf-item-arr">›</span></div>
           <div class="pf-item" onclick="toast('已安装 3 个技能')"><div class="pf-item-ic" style="background:rgba(80,180,120,0.06)">📦</div><div class="pf-item-nm">我的技能</div><span class="pf-item-arr">›</span></div>
           <div class="pf-item" onclick="toast('通知设置')"><div class="pf-item-ic" style="background:rgba(80,130,220,0.06)">🔔</div><div class="pf-item-nm">通知设置</div><span class="pf-item-arr">›</span></div>
-          <div class="pf-item" onclick="toast('账号安全')"><div class="pf-item-ic" style="background:rgba(220,160,60,0.06)">🔐</div><div class="pf-item-nm">账号安全</div><span class="pf-item-arr">›</span></div>
           <div class="pf-item" onclick="toast('关于 GoClaw v1.0.0')"><div class="pf-item-ic" style="background:rgba(255,255,255,0.03)">ℹ️</div><div class="pf-item-nm">关于</div><span class="pf-item-arr">›</span></div>
+        </div>
+        <!-- Logout -->
+        <div style="padding:32px 20px;">
+          <div onclick="logout()" style="text-align:center;padding:14px;border-radius:14px;border:1px solid rgba(220,60,60,0.2);color:rgba(220,100,100,0.8);font-size:15px;cursor:pointer;transition:background 0.15s;" onmousedown="this.style.background='rgba(220,60,60,0.08)'" onmouseup="this.style.background=''">退出登录</div>
         </div>
       </div>
     </div>
@@ -1297,6 +1310,37 @@ function openSkillDetail(slug) {
 setTimeout(loadSkills, 500);
 
 function installSk(b) { b.textContent='安装中...'; b.className='sk-btn done'; setTimeout(()=>{b.textContent='已安装';toast('✅ 技能安装成功');},800); }
+
+/* === Profile: Avatar & Nickname === */
+function changeAvatar() { document.getElementById('avatarInput').click(); }
+function handleAvatarChange(input) {
+  if(!input.files||!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const url = e.target.result;
+    // Update profile avatar
+    document.getElementById('pfAvatar').innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;"><div style="position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:rgba(100,80,200,0.3);display:flex;align-items:center;justify-content:center;font-size:11px;">📷</div>`;
+    // Update drawer avatar
+    document.getElementById('drawerAvatar').innerHTML = `<img src="${url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    toast('✅ 头像已更新');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function editNickname() {
+  const cur = document.getElementById('pfNickText').textContent;
+  const n = prompt('修改昵称', cur);
+  if(n && n.trim()) {
+    document.getElementById('pfNickText').textContent = n.trim();
+    document.getElementById('drawerUserName').textContent = n.trim();
+    toast('✅ 昵称已更新');
+  }
+}
+function logout() {
+  if(confirm('确定退出登录？')) {
+    toast('👋 已退出登录');
+    setTimeout(()=> nav('welcome'), 500);
+  }
+}
 
 /* Clock */
 function tick() { const n=new Date(); document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
