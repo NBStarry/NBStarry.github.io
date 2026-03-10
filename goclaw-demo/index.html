@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a10">
+<title>GoClaw 🦞</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'SF Pro Display', sans-serif; background: #0a0a10; color: #fff; }
+
+/* App container - phone-like on desktop */
+#app { width: 100%; height: 100%; max-width: 430px; margin: 0 auto; position: relative; overflow: hidden; }
+@media (min-width: 500px) {
+  body { background: #1a1a2e; display: flex; align-items: center; justify-content: center; }
+  #app { height: 90vh; max-height: 900px; border-radius: 44px; border: 4px solid #2a2a3e; box-shadow: 0 20px 80px rgba(100,80,200,0.15); }
+}
+
+/* Screen system */
+.screen { position: absolute; inset: 0; display: none; flex-direction: column; overflow: hidden; }
+.screen.active { display: flex; }
+.screen-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.screen-scroll::-webkit-scrollbar { display: none; }
+
+/* Aurora backgrounds */
+.aurora-bg { position: absolute; inset: 0; background: #0a0a10; overflow: hidden; z-index: 0; }
+.aurora-bg::before { content: ''; position: absolute; top: -20%; left: -10%; width: 120%; height: 60%; filter: blur(30px); }
+.aurora-bg.default::before { background: radial-gradient(ellipse at 30% 50%, rgba(56,120,160,0.25) 0%, transparent 55%), radial-gradient(ellipse at 70% 30%, rgba(100,160,120,0.15) 0%, transparent 50%), radial-gradient(ellipse at 50% 60%, rgba(160,120,80,0.08) 0%, transparent 50%); }
+.aurora-bg.warm::before { background: radial-gradient(ellipse at 40% 40%, rgba(180,100,60,0.2) 0%, transparent 50%), radial-gradient(ellipse at 60% 50%, rgba(120,80,160,0.15) 0%, transparent 50%); }
+.aurora-bg.cool::before { background: radial-gradient(ellipse at 30% 40%, rgba(60,100,180,0.2) 0%, transparent 55%), radial-gradient(ellipse at 70% 30%, rgba(80,160,140,0.12) 0%, transparent 50%); }
+.aurora-bg.purple::before { background: radial-gradient(ellipse at 40% 35%, rgba(100,80,180,0.25) 0%, transparent 50%), radial-gradient(ellipse at 65% 50%, rgba(160,60,120,0.12) 0%, transparent 50%); }
+
+/* z-index layers */
+.z-content { position: relative; z-index: 1; }
+
+/* Status bar */
+.status-bar { height: 54px; display: flex; align-items: flex-end; justify-content: space-between; padding: 0 28px 8px; font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.6); }
+
+/* Top bar */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 24px 12px; }
+.top-bar-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-size: 18px; cursor: pointer; }
+.top-bar-title { font-size: 17px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.top-bar-action { padding: 5px 12px; background: rgba(255,255,255,0.06); border-radius: 14px; font-size: 12px; color: rgba(255,255,255,0.5); cursor: pointer; }
+
+/* Chips */
+.chip { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); border-radius: 22px; font-size: 14px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.chip:active { background: rgba(255,255,255,0.08); transform: scale(0.97); }
+.chip-icon { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.chip-icon.blue { background: rgba(80,130,220,0.2); color: #6BA3F7; }
+.chip-icon.green { background: rgba(80,180,120,0.2); color: #5EC090; }
+.chip-icon.purple { background: rgba(140,100,200,0.2); color: #A78BFA; }
+.chip-icon.orange { background: rgba(220,140,60,0.2); color: #F0A050; }
+.chip-icon.pink { background: rgba(200,80,120,0.2); color: #F06090; }
+.chip-icon.cyan { background: rgba(60,180,200,0.2); color: #40C8D0; }
+.chip.highlight { background: rgba(100,80,200,0.12); border-color: rgba(100,80,200,0.2); }
+
+/* Input bar */
+.input-bar { padding: 12px 20px; padding-bottom: max(12px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10,10,16,0.98) 30%); }
+.input-bar-inner { display: flex; align-items: center; gap: 10px; }
+.input-field { flex: 1; display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; }
+.input-field input { background: none; border: none; outline: none; color: rgba(255,255,255,0.85); font-size: 15px; flex: 1; font-family: inherit; }
+.input-field input::placeholder { color: rgba(255,255,255,0.2); }
+.input-field-icon { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; font-size: 14px; color: rgba(255,255,255,0.3); flex-shrink: 0; }
+.input-action { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; cursor: pointer; transition: all 0.2s; }
+.input-action:active { background: rgba(100,80,200,0.2); }
+
+/* Tab bar */
+.tab-bar { display: flex; background: rgba(10,10,16,0.95); backdrop-filter: blur(30px); border-top: 1px solid rgba(255,255,255,0.03); padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: rgba(255,255,255,0.2); padding: 4px; cursor: pointer; transition: color 0.2s; }
+.tab-item.active { color: rgba(255,255,255,0.7); }
+.tab-icon { font-size: 20px; }
+.tab-dot { width: 4px; height: 4px; border-radius: 50%; background: transparent; }
+.tab-item.active .tab-dot { background: rgba(255,255,255,0.5); }
+
+/* Chat */
+.chat-area { padding: 12px 20px 20px; }
+.msg { margin-bottom: 16px; display: flex; gap: 10px; animation: msgIn 0.3s ease-out; }
+.msg.user { flex-direction: row-reverse; }
+@keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.msg-avatar { width: 32px; height: 32px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.msg.bot .msg-avatar { background: rgba(100,80,200,0.15); border: 1px solid rgba(100,80,200,0.1); }
+.msg.user .msg-avatar { background: rgba(255,255,255,0.06); }
+.msg-bubble { max-width: 78%; padding: 14px 18px; border-radius: 20px; font-size: 14px; line-height: 1.7; }
+.msg.bot .msg-bubble { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.04); border-bottom-left-radius: 6px; color: rgba(255,255,255,0.75); }
+.msg.user .msg-bubble { background: rgba(100,80,200,0.15); border: 1px solid rgba(100,80,200,0.1); border-bottom-right-radius: 6px; color: rgba(255,255,255,0.85); }
+.msg-time { font-size: 11px; color: rgba(255,255,255,0.12); text-align: center; margin: 20px 0 12px; }
+.msg-typing { display: flex; gap: 4px; padding: 8px 0; }
+.msg-typing span { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.2); animation: typing 1.2s infinite; }
+.msg-typing span:nth-child(2) { animation-delay: 0.2s; }
+.msg-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+/* News embed */
+.news-embed-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.news-embed-item:last-child { border-bottom: none; }
+.news-embed-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; flex-shrink: 0; }
+.news-embed-tag.tech { background: rgba(80,130,220,0.12); color: #6BA3F7; }
+.news-embed-tag.fin { background: rgba(220,160,60,0.12); color: #E8B040; }
+.news-embed-tag.soc { background: rgba(80,180,120,0.12); color: #5EC090; }
+.news-embed-text { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.5; }
+
+/* Stock grid */
+.stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.stock-cell { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03); border-radius: 14px; padding: 12px; text-align: center; }
+.stock-name { font-size: 11px; color: rgba(255,255,255,0.3); }
+.stock-price { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.85); margin: 4px 0 2px; }
+.stock-chg.up { color: #E05050; font-size: 12px; font-weight: 600; }
+.stock-chg.dn { color: #40C090; font-size: 12px; font-weight: 600; }
+
+/* Notification cards */
+.notif-area { padding: 16px 16px 20px; }
+.ncard { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); border-radius: 20px; padding: 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+.ncard:active { transform: scale(0.98); background: rgba(255,255,255,0.04); }
+.ncard-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ncard-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.ncard-icon.news { background: rgba(80,130,220,0.1); }
+.ncard-icon.stock { background: rgba(220,160,60,0.1); }
+.ncard-icon.email { background: rgba(80,180,120,0.1); }
+.ncard-title { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.ncard-time { font-size: 12px; color: rgba(255,255,255,0.2); }
+.ncard-body { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.7; }
+.ncard-body b { color: rgba(255,255,255,0.6); }
+.email-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.025); }
+.email-row:last-child { border-bottom: none; }
+.email-ava { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.04); display: flex; align-items: center; justify-content: center; font-size: 13px; color: rgba(255,255,255,0.4); flex-shrink: 0; }
+.email-from { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.7); }
+.email-subj { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.email-badge { background: rgba(220,60,60,0.15); color: #E06060; font-size: 10px; padding: 3px 8px; border-radius: 8px; font-weight: 700; }
+
+/* Skill store */
+.skill-area { padding: 0 0 20px; }
+.skill-banner { padding: 20px 24px; }
+.skill-banner h2 { font-size: 24px; font-weight: 800; color: rgba(255,255,255,0.85); }
+.skill-search { margin: 0 20px 20px; padding: 12px 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; font-size: 14px; color: rgba(255,255,255,0.15); display: flex; align-items: center; gap: 8px; }
+.skill-sect { padding: 0 20px; margin-bottom: 24px; }
+.skill-sect-title { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+.skill-scroll { display: flex; gap: 10px; overflow-x: auto; margin: 0 -20px; padding: 0 20px 4px; }
+.skill-scroll::-webkit-scrollbar { display: none; }
+.scard { min-width: 150px; background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); border-radius: 18px; padding: 18px 14px; flex-shrink: 0; }
+.scard-icon { font-size: 28px; margin-bottom: 10px; }
+.scard-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.scard-desc { font-size: 11px; color: rgba(255,255,255,0.25); line-height: 1.5; margin-bottom: 12px; height: 33px; overflow: hidden; }
+.scard-foot { display: flex; align-items: center; justify-content: space-between; }
+.scard-cnt { font-size: 10px; color: rgba(255,255,255,0.15); }
+.scard-btn { padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: 600; border: none; cursor: pointer; }
+.scard-btn.done { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.25); }
+.scard-btn.get { background: rgba(100,80,200,0.15); color: #A78BFA; }
+.scard-btn.pro { background: rgba(220,160,60,0.1); color: #E8B040; border: 1px solid rgba(220,160,60,0.1); }
+.slist { padding: 0 20px; }
+.slist-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.025); align-items: center; }
+.slist-icon { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.slist-name { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.75); }
+.slist-desc { font-size: 12px; color: rgba(255,255,255,0.25); margin-top: 2px; }
+.slist-meta { font-size: 10px; color: rgba(255,255,255,0.12); margin-top: 3px; }
+
+/* Subscription */
+.sub-area { padding: 20px; }
+.usage-card { background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.04); border-radius: 20px; padding: 22px; margin-bottom: 20px; }
+.usage-label { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
+.usage-bar-bg { height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; }
+.usage-bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, rgba(100,80,200,0.7), rgba(200,80,140,0.6)); transition: width 1s ease; }
+.usage-row { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 8px; }
+.usage-warn { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: rgba(220,160,60,0.05); border: 1px solid rgba(220,160,60,0.08); border-radius: 12px; margin-top: 14px; font-size: 13px; color: rgba(220,180,80,0.7); }
+.plan-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 20px; padding: 24px; margin-bottom: 12px; position: relative; }
+.plan-card.rec { border-color: rgba(100,80,200,0.15); background: rgba(100,80,200,0.03); }
+.plan-badge { position: absolute; top: -9px; right: 18px; background: rgba(100,80,200,0.25); color: #B8A0F0; font-size: 10px; padding: 3px 10px; border-radius: 8px; font-weight: 700; }
+.plan-name { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.plan-price { font-size: 30px; font-weight: 900; color: rgba(255,255,255,0.8); margin: 4px 0; }
+.plan-price span { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.2); }
+.plan-feat { font-size: 13px; color: rgba(255,255,255,0.35); margin: 4px 0; }
+.plan-feat.off { color: rgba(255,255,255,0.15); }
+.plan-btn { width: 100%; padding: 13px; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; margin-top: 16px; cursor: pointer; }
+.plan-btn.primary { background: rgba(100,80,200,0.2); color: #B8A0F0; }
+.plan-btn:active { transform: scale(0.98); }
+.plan-btn.muted { background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.2); }
+
+/* Device */
+.dev-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 22px; padding: 28px; margin: 16px 20px; text-align: center; }
+.dev-box { width: 120px; height: 76px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; }
+.dev-led { width: 10px; height: 10px; border-radius: 50%; background: #40C090; box-shadow: 0 0 12px rgba(64,192,144,0.4); animation: blink 3s infinite; }
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0.5} }
+.dev-name { font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.dev-model { font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 3px; }
+.dev-stats { display: flex; justify-content: space-around; margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.03); }
+.dev-stat-val { font-size: 18px; font-weight: 800; color: rgba(255,255,255,0.7); }
+.dev-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 2px; }
+.dev-actions { padding: 0 20px 20px; }
+.dev-sect-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.3); margin-bottom: 10px; }
+.dev-act { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
+.dev-act:active { background: rgba(255,255,255,0.05); }
+.dev-act-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.dev-act-name { font-size: 14px; color: rgba(255,255,255,0.7); }
+.dev-act-desc { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 1px; }
+.dev-act-arr { color: rgba(255,255,255,0.08); font-size: 16px; margin-left: auto; }
+
+/* Voice overlay */
+.voice-overlay { position: absolute; inset: 0; z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; }
+.voice-overlay.active { display: flex; }
+.voice-orb { width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(100,80,200,0.2) 0%, transparent 70%); display: flex; align-items: center; justify-content: center; position: relative; }
+.voice-orb::before, .voice-orb::after { content: ''; position: absolute; border-radius: 50%; border: 1px solid rgba(100,80,200,0.1); }
+.voice-orb::before { inset: -12px; animation: expand 2s infinite; }
+.voice-orb::after { inset: -28px; animation: expand 2s infinite 0.6s; }
+@keyframes expand { 0%{transform:scale(1);opacity:0.8} 100%{transform:scale(1.2);opacity:0} }
+.voice-core { width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, rgba(100,80,200,0.4), rgba(160,60,140,0.3)); display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.voice-label { font-size: 17px; font-weight: 600; color: rgba(160,140,240,0.8); margin-top: 28px; }
+.voice-text { font-size: 14px; color: rgba(255,255,255,0.2); margin-top: 8px; min-height: 20px; }
+.voice-bars { display: flex; gap: 3px; margin-top: 24px; align-items: center; }
+.voice-bar { width: 2.5px; border-radius: 2px; background: rgba(140,120,220,0.5); animation: vb .8s infinite; }
+@keyframes vb { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(0.3)} }
+.voice-stop { width: 56px; height: 56px; border-radius: 50%; background: rgba(220,60,60,0.2); border: 1px solid rgba(220,60,60,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-top: 40px; cursor: pointer; }
+.voice-stop:active { background: rgba(220,60,60,0.35); }
+
+/* Onboarding */
+.onboard-content { display: flex; flex-direction: column; height: 100%; }
+.onboard-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 0 28px; }
+.onboard-greeting { font-size: 34px; font-weight: 800; color: rgba(255,255,255,0.9); line-height: 1.3; }
+.onboard-sub { font-size: 16px; color: rgba(255,255,255,0.3); margin-top: 8px; }
+.onboard-chips { padding: 24px; display: flex; flex-wrap: wrap; gap: 10px; }
+.float-btn { padding: 15px; background: rgba(100,80,200,0.2); border: 1px solid rgba(100,80,200,0.15); border-radius: 16px; text-align: center; font-size: 16px; font-weight: 600; color: #B8A0F0; margin: 0 24px 20px; cursor: pointer; backdrop-filter: blur(10px); transition: all 0.2s; }
+.float-btn:active { background: rgba(100,80,200,0.35); transform: scale(0.98); }
+
+/* Email config */
+.email-config { padding: 28px 24px; }
+.email-config h2 { font-size: 22px; font-weight: 800; color: rgba(255,255,255,0.85); margin-bottom: 6px; }
+.email-config p { font-size: 14px; color: rgba(255,255,255,0.25); margin-bottom: 24px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 8px; }
+.form-input { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; color: rgba(255,255,255,0.85); font-size: 15px; outline: none; font-family: inherit; transition: border-color 0.2s; }
+.form-input:focus { border-color: rgba(100,80,200,0.3); }
+.form-input::placeholder { color: rgba(255,255,255,0.15); }
+.form-select { width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; color: rgba(255,255,255,0.85); font-size: 15px; outline: none; font-family: inherit; appearance: none; }
+.form-select option { background: #1a1a2e; color: #fff; }
+
+/* Profile */
+.profile-area { padding: 20px; text-align: center; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: rgba(100,80,200,0.15); border: 2px solid rgba(100,80,200,0.1); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 20px auto 14px; }
+.profile-name { font-size: 20px; font-weight: 700; color: rgba(255,255,255,0.85); }
+.profile-plan { font-size: 13px; color: rgba(255,255,255,0.25); margin-top: 4px; }
+.profile-menu { margin-top: 24px; text-align: left; }
+.profile-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 6px; cursor: pointer; transition: all 0.2s; }
+.profile-item:active { background: rgba(255,255,255,0.05); }
+.profile-item-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.profile-item-name { font-size: 14px; color: rgba(255,255,255,0.7); flex: 1; }
+.profile-item-arr { color: rgba(255,255,255,0.08); font-size: 16px; }
+
+/* Toast */
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: rgba(100,80,200,0.3); border: 1px solid rgba(100,80,200,0.2); backdrop-filter: blur(20px); padding: 10px 20px; border-radius: 12px; font-size: 14px; color: rgba(255,255,255,0.9); z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* Page transitions */
+.screen { transition: opacity 0.25s, transform 0.25s; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Voice overlay -->
+  <div class="voice-overlay" id="voiceOverlay">
+    <div class="aurora-bg warm"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;">
+      <div class="voice-orb"><div class="voice-core">🎤</div></div>
+      <div class="voice-label">正在聆听...</div>
+      <div class="voice-text" id="voiceTranscript">"今天有什么新邮件？"</div>
+      <div class="voice-bars">
+        <div class="voice-bar" style="height:14px;animation-delay:0s"></div>
+        <div class="voice-bar" style="height:24px;animation-delay:.1s"></div>
+        <div class="voice-bar" style="height:18px;animation-delay:.2s"></div>
+        <div class="voice-bar" style="height:28px;animation-delay:.3s"></div>
+        <div class="voice-bar" style="height:12px;animation-delay:.4s"></div>
+        <div class="voice-bar" style="height:22px;animation-delay:.5s"></div>
+        <div class="voice-bar" style="height:16px;animation-delay:.6s"></div>
+        <div class="voice-bar" style="height:26px;animation-delay:.15s"></div>
+        <div class="voice-bar" style="height:10px;animation-delay:.45s"></div>
+      </div>
+      <div class="voice-stop" onclick="closeVoice()">⏹</div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Welcome ===== -->
+  <div class="screen active" id="screen-welcome">
+    <div class="aurora-bg default"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>12:36</span><span>📶 🔋64</span></div>
+      <div class="onboard-content">
+        <div class="onboard-hero">
+          <div style="font-size:60px;margin-bottom:16px;">🦞</div>
+          <div class="onboard-greeting">Hi, 朋友</div>
+          <div class="onboard-sub">你的 AI 管家已就绪</div>
+        </div>
+        <div class="onboard-chips">
+          <div class="chip" onclick="showToast('资讯技能已就绪')"><div class="chip-icon blue">📰</div> 每日资讯速览</div>
+          <div class="chip" onclick="showToast('行情技能已就绪')"><div class="chip-icon green">📈</div> 看看今天行情</div>
+          <div class="chip" onclick="showToast('邮件技能已就绪')"><div class="chip-icon purple">📧</div> 帮我查邮件</div>
+          <div class="chip highlight" onclick="showToast('更多技能请到商城')"><div class="chip-icon cyan">🔥</div> 近期热点速看</div>
+        </div>
+        <div class="float-btn" onclick="goTo('email-config')">开始使用 →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Email Config ===== -->
+  <div class="screen" id="screen-email-config">
+    <div class="aurora-bg cool"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>12:37</span><span>📶 🔋64</span></div>
+      <div class="top-bar">
+        <div class="top-bar-icon" onclick="goTo('welcome')">←</div>
+        <div class="top-bar-title">配置邮箱</div>
+        <div style="width:32px"></div>
+      </div>
+      <div class="screen-scroll">
+        <div class="email-config">
+          <h2>📧 连接你的邮箱</h2>
+          <p>GoClaw 会帮你智能分类和提醒重要邮件</p>
+          <div class="form-group">
+            <div class="form-label">邮箱类型</div>
+            <select class="form-select" id="emailType">
+              <option value="gmail">Gmail</option>
+              <option value="qq">QQ 邮箱</option>
+              <option value="163">网易 163</option>
+              <option value="outlook">Outlook</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <div class="form-label">邮箱地址</div>
+            <input class="form-input" type="email" placeholder="你的邮箱地址" id="emailAddr">
+          </div>
+          <div class="form-group">
+            <div class="form-label">授权码</div>
+            <input class="form-input" type="password" placeholder="邮箱授权码（非登录密码）" id="emailAuth">
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.15);margin-bottom:20px;line-height:1.6;">
+            💡 授权码不是登录密码。前往邮箱设置 → POP3/IMAP → 获取授权码
+          </div>
+        </div>
+      </div>
+      <div class="float-btn" onclick="completeSetup()">完成配置</div>
+      <div style="text-align:center;padding:0 0 20px;font-size:13px;color:rgba(255,255,255,0.15);cursor:pointer;" onclick="completeSetup()">稍后再配置 →</div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Chat (Main) ===== -->
+  <div class="screen" id="screen-chat">
+    <div class="aurora-bg default"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span id="chatTime">09:35</span><span>📶 🔋64</span></div>
+      <div class="top-bar">
+        <div class="top-bar-icon" onclick="goTo('notifications')">🔔</div>
+        <div class="top-bar-title">GoClaw</div>
+        <div class="top-bar-action" onclick="switchTab('skill')">⚡ 技能</div>
+      </div>
+      <div style="display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;flex-shrink:0;" id="quickChips">
+        <div class="chip" style="padding:7px 14px;font-size:13px;" onclick="sendQuick('今日资讯')"><div class="chip-icon blue" style="width:20px;height:20px;border-radius:6px;font-size:11px;">📰</div> 今日资讯</div>
+        <div class="chip" style="padding:7px 14px;font-size:13px;" onclick="sendQuick('今天行情怎么样')"><div class="chip-icon green" style="width:20px;height:20px;border-radius:6px;font-size:11px;">📈</div> 看行情</div>
+        <div class="chip" style="padding:7px 14px;font-size:13px;" onclick="sendQuick('有什么新邮件')"><div class="chip-icon purple" style="width:20px;height:20px;border-radius:6px;font-size:11px;">📧</div> 查邮件</div>
+      </div>
+      <div class="screen-scroll" id="chatScroll">
+        <div class="chat-area" id="chatArea">
+          <div class="msg-time">今天 08:00</div>
+          <div class="msg bot">
+            <div class="msg-avatar">🦞</div>
+            <div class="msg-bubble">
+              ☀️ 早安！今日要闻：
+              <div style="margin-top:10px;">
+                <div class="news-embed-item"><span class="news-embed-tag tech">科技</span><span class="news-embed-text">OpenAI 发布 GPT-6，推理能力 ×3</span></div>
+                <div class="news-embed-item"><span class="news-embed-tag fin">财经</span><span class="news-embed-text">A 股三大指数高开，半导体领涨</span></div>
+                <div class="news-embed-item"><span class="news-embed-tag soc">社会</span><span class="news-embed-text">北京发布暴雨蓝色预警</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="input-bar">
+        <div class="input-bar-inner">
+          <div class="input-field">
+            <div class="input-field-icon">🦞</div>
+            <input type="text" placeholder="输入消息..." id="chatInput" onkeydown="if(event.key==='Enter')sendMsg()">
+          </div>
+          <div class="input-action" onclick="openVoice()">🎤</div>
+          <div class="input-action" onclick="sendMsg()">➤</div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('chat')"><span class="tab-icon">💬</span>对话<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('skill')"><span class="tab-icon">📦</span>技能<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('device')"><span class="tab-icon">📱</span>设备<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('profile')"><span class="tab-icon">👤</span>我的<div class="tab-dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Notifications ===== -->
+  <div class="screen" id="screen-notifications">
+    <div class="aurora-bg cool"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>08:00</span><span>📶 🔋64</span></div>
+      <div class="top-bar"><div class="top-bar-icon" onclick="goTo('chat')">←</div><div class="top-bar-title">通知</div><div style="width:32px"></div></div>
+      <div class="screen-scroll">
+        <div class="notif-area">
+          <div class="ncard">
+            <div class="ncard-head"><div class="ncard-icon news">📰</div><div><div class="ncard-title">资讯早报</div><div class="ncard-time">今天 08:00</div></div></div>
+            <div class="ncard-body">
+              ☀️ 早安，今日要闻（3月10日）：
+              <ul style="padding-left:16px;margin-top:6px;">
+                <li><b style="color:#6BA3F7">【科技】</b>OpenAI 发布 GPT-6</li>
+                <li><b style="color:#E8B040">【财经】</b>A 股半导体领涨</li>
+                <li><b style="color:#5EC090">【社会】</b>北京暴雨预警</li>
+                <li><b style="color:#60A5FA">【国际】</b>欧盟 AI 监管新框架</li>
+              </ul>
+            </div>
+          </div>
+          <div class="ncard">
+            <div class="ncard-head"><div class="ncard-icon stock">📈</div><div><div class="ncard-title">收盘复盘</div><div class="ncard-time">昨天 15:30</div></div></div>
+            <div class="ncard-body">昨日自选：</div>
+            <div class="stock-grid">
+              <div class="stock-cell"><div class="stock-name">黄金 ETF</div><div class="stock-price">5.832</div><div class="stock-chg up">+0.35%</div></div>
+              <div class="stock-cell"><div class="stock-name">红利 ETF</div><div class="stock-price">1.285</div><div class="stock-chg up">+0.68%</div></div>
+              <div class="stock-cell"><div class="stock-name">欧洲 ETF</div><div class="stock-price">1.142</div><div class="stock-chg dn">-0.24%</div></div>
+              <div class="stock-cell"><div class="stock-name">港股 ETF</div><div class="stock-price">0.978</div><div class="stock-chg up">+1.12%</div></div>
+            </div>
+          </div>
+          <div class="ncard">
+            <div class="ncard-head"><div class="ncard-icon email">📧</div><div><div class="ncard-title">邮件提醒</div><div class="ncard-time">今天 09:15</div></div></div>
+            <div class="ncard-body">3 封新邮件，1 封重要：</div>
+            <div class="email-row"><div class="email-ava">张</div><div style="flex:1"><div class="email-from">张总</div><div class="email-subj">Q2 项目进度</div></div><span class="email-badge">重要</span></div>
+            <div class="email-row"><div class="email-ava">李</div><div style="flex:1"><div class="email-from">李经理</div><div class="email-subj">团建方案投票</div></div></div>
+            <div class="email-row"><div class="email-ava">HR</div><div style="flex:1"><div class="email-from">人事部</div><div class="email-subj">3月考勤汇总</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Skill Store ===== -->
+  <div class="screen" id="screen-skill">
+    <div class="aurora-bg purple"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>11:20</span><span>📶 🔋64</span></div>
+      <div class="screen-scroll">
+        <div class="skill-area">
+          <div class="skill-banner"><h2>📦 技能商城</h2></div>
+          <div class="skill-search">🔍 搜索技能...</div>
+          <div class="skill-sect">
+            <div class="skill-sect-title">🔥 热门</div>
+            <div class="skill-scroll">
+              <div class="scard"><div class="scard-icon">📰</div><div class="scard-name">资讯早报</div><div class="scard-desc">每日热门新闻摘要</div><div class="scard-foot"><span class="scard-cnt">12.5k</span><button class="scard-btn done">已安装</button></div></div>
+              <div class="scard"><div class="scard-icon">📈</div><div class="scard-name">股市助手</div><div class="scard-desc">行情追踪异动提醒</div><div class="scard-foot"><span class="scard-cnt">8.2k</span><button class="scard-btn done">已安装</button></div></div>
+              <div class="scard"><div class="scard-icon">📧</div><div class="scard-name">邮件管家</div><div class="scard-desc">智能分类语音回复</div><div class="scard-foot"><span class="scard-cnt">6.8k</span><button class="scard-btn done">已安装</button></div></div>
+            </div>
+          </div>
+          <div class="skill-sect"><div class="skill-sect-title">🆕 更多技能</div></div>
+          <div class="slist">
+            <div class="slist-item"><div class="slist-icon" style="background:rgba(80,130,220,0.06)">📅</div><div class="slist-info"><div class="slist-name">日程提醒</div><div class="slist-desc">会议安排、待办管理</div><div class="slist-meta">3.2k · 免费</div></div><button class="scard-btn get" onclick="installSkill(this)">安装</button></div>
+            <div class="slist-item"><div class="slist-icon" style="background:rgba(80,180,120,0.06)">🌤️</div><div class="slist-info"><div class="slist-name">天气管家</div><div class="slist-desc">出门提醒、穿衣建议</div><div class="slist-meta">5.1k · 免费</div></div><button class="scard-btn get" onclick="installSkill(this)">安装</button></div>
+            <div class="slist-item"><div class="slist-icon" style="background:rgba(220,160,60,0.06)">💰</div><div class="slist-info"><div class="slist-name">记账助手</div><div class="slist-desc">语音记账、消费分析</div><div class="slist-meta">2.1k · 订阅</div></div><button class="scard-btn pro">🔒 PRO</button></div>
+            <div class="slist-item"><div class="slist-icon" style="background:rgba(200,80,120,0.06)">🏠</div><div class="slist-info"><div class="slist-name">智能家居</div><div class="slist-desc">联动 HA，语音控制</div><div class="slist-meta">1.5k · 订阅</div></div><button class="scard-btn pro">🔒 PRO</button></div>
+            <div class="slist-item"><div class="slist-icon" style="background:rgba(140,100,200,0.06)">📖</div><div class="slist-info"><div class="slist-name">阅读摘要</div><div class="slist-desc">网页 PDF 一键摘要</div><div class="slist-meta">4.3k · 免费</div></div><button class="scard-btn get" onclick="installSkill(this)">安装</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item" onclick="switchTab('chat')"><span class="tab-icon">💬</span>对话<div class="tab-dot"></div></div>
+        <div class="tab-item active" onclick="switchTab('skill')"><span class="tab-icon">📦</span>技能<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('device')"><span class="tab-icon">📱</span>设备<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('profile')"><span class="tab-icon">👤</span>我的<div class="tab-dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Device ===== -->
+  <div class="screen" id="screen-device">
+    <div class="aurora-bg cool"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>11:20</span><span>📶 🔋64</span></div>
+      <div class="top-bar"><div style="width:32px"></div><div class="top-bar-title">设备</div><div style="width:32px"></div></div>
+      <div class="screen-scroll">
+        <div class="dev-card">
+          <div class="dev-box"><div class="dev-led"></div></div>
+          <div class="dev-name">客厅的 GoClaw</div>
+          <div class="dev-model">GoClaw Mini · GC-2026-A001</div>
+          <div class="dev-stats">
+            <div><div class="dev-stat-val" style="color:#40C090">在线</div><div class="dev-stat-lbl">状态</div></div>
+            <div><div class="dev-stat-val">72h</div><div class="dev-stat-lbl">运行</div></div>
+            <div><div class="dev-stat-val">3</div><div class="dev-stat-lbl">技能</div></div>
+          </div>
+        </div>
+        <div class="dev-actions">
+          <div class="dev-sect-title">设备操作</div>
+          <div class="dev-act" onclick="showToast('已连接 Home_WiFi_5G')"><div class="dev-act-icon" style="background:rgba(80,130,220,0.06)">📡</div><div><div class="dev-act-name">网络设置</div><div class="dev-act-desc">Home_WiFi_5G</div></div><span class="dev-act-arr">›</span></div>
+          <div class="dev-act" onclick="showToast('v1.0.0 已是最新版本')"><div class="dev-act-icon" style="background:rgba(80,180,120,0.06)">🔄</div><div><div class="dev-act-name">检查更新</div><div class="dev-act-desc">v1.0.0 · 已是最新</div></div><span class="dev-act-arr">›</span></div>
+          <div class="dev-act" onclick="showToast('设备重启中...')"><div class="dev-act-icon" style="background:rgba(220,160,60,0.06)">🔁</div><div><div class="dev-act-name">远程重启</div><div class="dev-act-desc">重启设备</div></div><span class="dev-act-arr">›</span></div>
+          <div class="dev-act" onclick="showToast('⚠️ 请在设置中确认')"><div class="dev-act-icon" style="background:rgba(220,60,60,0.06)">⚠️</div><div><div class="dev-act-name">恢复出厂</div><div class="dev-act-desc">清除所有数据</div></div><span class="dev-act-arr">›</span></div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item" onclick="switchTab('chat')"><span class="tab-icon">💬</span>对话<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('skill')"><span class="tab-icon">📦</span>技能<div class="tab-dot"></div></div>
+        <div class="tab-item active" onclick="switchTab('device')"><span class="tab-icon">📱</span>设备<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('profile')"><span class="tab-icon">👤</span>我的<div class="tab-dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Profile ===== -->
+  <div class="screen" id="screen-profile">
+    <div class="aurora-bg purple"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>11:20</span><span>📶 🔋64</span></div>
+      <div class="top-bar"><div style="width:32px"></div><div class="top-bar-title">我的</div><div style="width:32px"></div></div>
+      <div class="screen-scroll">
+        <div class="profile-area">
+          <div class="profile-avatar">🦞</div>
+          <div class="profile-name">GoClaw 用户</div>
+          <div class="profile-plan">免费版 · 今日剩余 28%</div>
+          <div class="profile-menu">
+            <div class="profile-item" onclick="goTo('subscription')"><div class="profile-item-icon" style="background:rgba(100,80,200,0.06)">💎</div><div class="profile-item-name">订阅管理</div><span class="profile-item-arr">›</span></div>
+            <div class="profile-item" onclick="showToast('已安装 3 个技能')"><div class="profile-item-icon" style="background:rgba(80,180,120,0.06)">📦</div><div class="profile-item-name">我的技能</div><span class="profile-item-arr">›</span></div>
+            <div class="profile-item" onclick="showToast('通知设置')"><div class="profile-item-icon" style="background:rgba(80,130,220,0.06)">🔔</div><div class="profile-item-name">通知设置</div><span class="profile-item-arr">›</span></div>
+            <div class="profile-item" onclick="showToast('账号安全')"><div class="profile-item-icon" style="background:rgba(220,160,60,0.06)">🔐</div><div class="profile-item-name">账号安全</div><span class="profile-item-arr">›</span></div>
+            <div class="profile-item" onclick="showToast('关于 GoClaw v1.0.0')"><div class="profile-item-icon" style="background:rgba(255,255,255,0.03)">ℹ️</div><div class="profile-item-name">关于</div><span class="profile-item-arr">›</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item" onclick="switchTab('chat')"><span class="tab-icon">💬</span>对话<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('skill')"><span class="tab-icon">📦</span>技能<div class="tab-dot"></div></div>
+        <div class="tab-item" onclick="switchTab('device')"><span class="tab-icon">📱</span>设备<div class="tab-dot"></div></div>
+        <div class="tab-item active" onclick="switchTab('profile')"><span class="tab-icon">👤</span>我的<div class="tab-dot"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Screen: Subscription ===== -->
+  <div class="screen" id="screen-subscription">
+    <div class="aurora-bg warm"></div>
+    <div class="z-content" style="display:flex;flex-direction:column;height:100%;">
+      <div class="status-bar"><span>11:20</span><span>📶 🔋64</span></div>
+      <div class="top-bar"><div class="top-bar-icon" onclick="switchTab('profile')">←</div><div class="top-bar-title">订阅管理</div><div style="width:32px"></div></div>
+      <div class="screen-scroll">
+        <div class="sub-area">
+          <div class="usage-card">
+            <div class="usage-label">今日用量</div>
+            <div class="usage-bar-bg"><div class="usage-bar-fill" style="width:72%"></div></div>
+            <div class="usage-row"><span>已用 72%</span><span>剩余 28%</span></div>
+            <div class="usage-warn">⚠️ 额度即将用完，升级解锁无限</div>
+          </div>
+          <div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:14px;">选择方案</div>
+          <div class="plan-card">
+            <div class="plan-name">免费版</div>
+            <div class="plan-price">¥0 <span>/月</span></div>
+            <div class="plan-feat">✅ 每日基础额度</div>
+            <div class="plan-feat">✅ 3 个基础技能</div>
+            <div class="plan-feat off">✖ 高级模型</div>
+            <div class="plan-feat off">✖ 高级技能</div>
+            <button class="plan-btn muted">当前方案</button>
+          </div>
+          <div class="plan-card rec">
+            <div class="plan-badge">推荐</div>
+            <div class="plan-name">专业版</div>
+            <div class="plan-price">¥XX <span>/月</span></div>
+            <div class="plan-feat">✅ 无限用量</div>
+            <div class="plan-feat">✅ 全部技能解锁</div>
+            <div class="plan-feat">✅ 高级模型可选</div>
+            <div class="plan-feat">✅ 优先响应</div>
+            <button class="plan-btn primary" onclick="showToast('订阅功能即将上线')">立即订阅</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Navigation
+function goTo(screenName) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screenName).classList.add('active');
+}
+
+function switchTab(tabName) {
+  goTo(tabName);
+  // Update tab bar active state in the target screen
+  const screen = document.getElementById('screen-' + tabName);
+  if (screen) {
+    screen.querySelectorAll('.tab-item').forEach((t, i) => {
+      t.classList.toggle('active', t.textContent.includes(
+        {'chat':'对话','skill':'技能','device':'设备','profile':'我的'}[tabName]
+      ));
+    });
+  }
+}
+
+// Toast
+let toastTimer;
+function showToast(text) {
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Onboarding complete
+function completeSetup() {
+  showToast('✅ 配置完成，欢迎使用 GoClaw！');
+  setTimeout(() => goTo('chat'), 500);
+}
+
+// Chat functionality
+const responses = {
+  '今日资讯': `☀️ 今日要闻：<div style="margin-top:10px;"><div class="news-embed-item"><span class="news-embed-tag tech">科技</span><span class="news-embed-text">OpenAI 发布 GPT-6，推理能力提升 3 倍</span></div><div class="news-embed-item"><span class="news-embed-tag fin">财经</span><span class="news-embed-text">A 股三大指数高开，半导体领涨 2.3%</span></div><div class="news-embed-item"><span class="news-embed-tag soc">社会</span><span class="news-embed-text">北京发布暴雨蓝色预警，注意出行安全</span></div></div>`,
+  '今天行情怎么样': `截至最新：<br>上证 3,287 <span style="color:#E05050">+0.82%</span><br>深证 10,892 <span style="color:#E05050">+1.15%</span><br>创业板 2,156 <span style="color:#E05050">+1.43%</span><br><br><span style="color:rgba(255,255,255,0.3)">你的自选：</span><br>黄金 ETF <span style="color:#E05050">+0.35%</span> · 红利 ETF <span style="color:#E05050">+0.68%</span>`,
+  '有什么新邮件': `找到 3 封新邮件：<br><br>📧 <b>Q2 项目进度</b><br><span style="color:rgba(255,255,255,0.25)">张总 · 08:52 · ⚠️重要</span><br>摘要：请本周五前提交阶段报告<br><br>📧 <b>团建方案投票</b><br><span style="color:rgba(255,255,255,0.25)">李经理 · 09:10</span><br><br>📧 <b>3月考勤汇总</b><br><span style="color:rgba(255,255,255,0.25)">人事部 · 09:15</span><br><br><span style="color:rgba(160,140,240,0.7)">需要帮你回复张总吗？</span>`,
+};
+
+const defaultResponses = [
+  '收到！让我帮你看看... 🦞',
+  '好的，正在处理你的请求...',
+  '这个问题很有趣，让我想想... 🤔',
+  '已收到，我来帮你查一下。',
+  '没问题！',
+];
+
+function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addMessage(text, 'user');
+  // Show typing
+  setTimeout(() => {
+    const typingId = addTyping();
+    setTimeout(() => {
+      removeTyping(typingId);
+      const reply = responses[text] || defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+      addMessage(reply, 'bot');
+    }, 1000 + Math.random() * 1000);
+  }, 300);
+}
+
+function sendQuick(text) {
+  document.getElementById('chatInput').value = text;
+  sendMsg();
+}
+
+function addMessage(html, type) {
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.innerHTML = `<div class="msg-avatar">${type === 'bot' ? '🦞' : '👤'}</div><div class="msg-bubble">${html}</div>`;
+  area.appendChild(div);
+  const scroll = document.getElementById('chatScroll');
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+let typingCount = 0;
+function addTyping() {
+  const id = 'typing-' + (++typingCount);
+  const area = document.getElementById('chatArea');
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = id;
+  div.innerHTML = `<div class="msg-avatar">🦞</div><div class="msg-bubble"><div class="msg-typing"><span></span><span></span><span></span></div></div>`;
+  area.appendChild(div);
+  const scroll = document.getElementById('chatScroll');
+  scroll.scrollTop = scroll.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// Voice
+function openVoice() {
+  document.getElementById('voiceOverlay').classList.add('active');
+  const texts = ['"今天有什么新邮件？"', '"看看A股行情"', '"帮我回复张总"', '"今天天气怎么样"'];
+  document.getElementById('voiceTranscript').textContent = texts[Math.floor(Math.random() * texts.length)];
+}
+function closeVoice() {
+  document.getElementById('voiceOverlay').classList.remove('active');
+  const text = document.getElementById('voiceTranscript').textContent.replace(/[""]/g, '');
+  if (text) {
+    document.getElementById('chatInput').value = text;
+    goTo('chat');
+    setTimeout(() => sendMsg(), 300);
+  }
+}
+
+// Install skill
+function installSkill(btn) {
+  btn.textContent = '安装中...';
+  btn.className = 'scard-btn done';
+  setTimeout(() => {
+    btn.textContent = '已安装';
+    showToast('✅ 技能安装成功');
+  }, 1000);
+}
+
+// Update time
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('chatTime').textContent = h + ':' + m;
+}
+updateTime();
+setInterval(updateTime, 60000);
+</script>
+</body>
+</html>
