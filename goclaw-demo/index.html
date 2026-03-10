@@ -270,22 +270,15 @@ body {
 }
 .gem-field input::placeholder { color: rgba(255,255,255,0.2); }
 .gem-field-mic {
-  width: 28px; height: 28px;
+  width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: rgba(255,255,255,0.3);
   flex-shrink: 0; cursor: pointer;
+  border-radius: 50%;
+  transition: background 0.15s;
 }
-.gem-voice {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(100,80,200,0.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; color: rgba(180,160,240,0.9);
-  flex-shrink: 0; cursor: pointer;
-  min-width: 40px; min-height: 40px;
-  transition: background 0.2s, transform 0.1s;
-}
-.gem-voice:active { background: rgba(100,80,200,0.4); transform: scale(0.9); }
-.gem-voice.recording { animation: mic-pulse 1s infinite; }
+.gem-field-mic:active { background: rgba(255,255,255,0.08); }
+.gem-field-mic.recording { background: rgba(100,80,200,0.2); }
+.gem-field-mic.recording svg { stroke: rgba(180,160,240,0.9); }
 @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(100,80,200,0.3)} 50%{box-shadow:0 0 0 12px rgba(100,80,200,0)} }
 
 /* === Tab Bar (iOS standard: 49pt + safe area 34pt = 83pt) === */
@@ -913,16 +906,17 @@ body {
           <div class="msg bot"><div class="msg-av">🦞</div><div class="msg-bbl">☀️ 早安！今日要闻：<div style="margin-top:10px"><div class="news-item"><span class="news-tag tech">科技</span><span class="news-txt">OpenAI 发布 GPT-6，推理能力 ×3</span></div><div class="news-item"><span class="news-tag fin">财经</span><span class="news-txt">A 股三大指数高开，半导体领涨</span></div><div class="news-item"><span class="news-tag soc">社会</span><span class="news-txt">北京发布暴雨蓝色预警</span></div></div></div></div>
         </div>
       </div>
-      <!-- Gemini-style input bar (single row) -->
+      <!-- Gemini-style input bar -->
       <div class="gem-input">
         <div class="gem-plus" onclick="toast('📎 选择文件/照片')">＋</div>
         <div class="gem-field">
           <input type="text" placeholder="询问任何问题" id="chatIn" onkeydown="if(event.key==='Enter')sendMsg()">
-          <div class="gem-field-mic" onclick="sendMsg()">🎙️</div>
+          <div class="gem-field-mic" id="micBtn"
+            onmousedown="micStart()" onmouseup="micEnd()" onmouseleave="micEnd()"
+            ontouchstart="micStart()" ontouchend="micEnd()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="1" width="6" height="12" rx="3"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+          </div>
         </div>
-        <div class="gem-voice" id="micBtn"
-          onmousedown="micStart()" onmouseup="micEnd()" onmouseleave="micEnd()"
-          ontouchstart="micStart()" ontouchend="micEnd()">🎤</div>
       </div>
     </div>
   </div>
