@@ -420,14 +420,13 @@ body {
 }
 
 /* === Skill Store === */
-.sk-banner { padding: 20px 24px; }
-.sk-banner h2 { font-size: 24px; font-weight: 800; color: rgba(255,255,255,0.85); }
-.sk-search {
-  margin: 0 20px 20px; padding: 12px 18px;
-  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04);
-  border-radius: 16px; font-size: 14px; color: rgba(255,255,255,0.15);
+.sk-search-bar {
   display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px; cursor: text;
 }
+.sk-search-bar input::placeholder { color: rgba(255,255,255,0.2); }
 .sk-sect { padding: 0 20px; margin-bottom: 24px; }
 .sk-sect-tt { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 14px; }
 .sk-scroll {
@@ -945,16 +944,21 @@ body {
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
       <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">技能商城</div><div style="width:44px"></div></div>
       <div class="screen-body">
-        <div class="sk-banner"><h2>📦 技能商城</h2></div>
-        <div class="sk-search">🔍 搜索技能...</div>
-        <div class="sk-sect"><div class="sk-sect-tt">🔥 热门</div><div class="sk-scroll"><div class="sk-card"><div class="sk-card-ico">📰</div><div class="sk-card-nm">资讯早报</div><div class="sk-card-desc">每日热门新闻摘要</div><div class="sk-card-ft"><span class="sk-card-cnt">12.5k</span><button class="sk-btn done">已安装</button></div></div><div class="sk-card"><div class="sk-card-ico">📈</div><div class="sk-card-nm">股市助手</div><div class="sk-card-desc">行情追踪异动提醒</div><div class="sk-card-ft"><span class="sk-card-cnt">8.2k</span><button class="sk-btn done">已安装</button></div></div><div class="sk-card"><div class="sk-card-ico">📧</div><div class="sk-card-nm">邮件管家</div><div class="sk-card-desc">智能分类语音回复</div><div class="sk-card-ft"><span class="sk-card-cnt">6.8k</span><button class="sk-btn done">已安装</button></div></div></div></div>
+        <div style="padding:0 20px 12px;">
+          <div class="sk-search-bar" onclick="document.getElementById('skSearchIn').focus()">
+            <span style="color:rgba(255,255,255,0.2)">🔍</span>
+            <input type="text" id="skSearchIn" placeholder="搜索技能..." oninput="filterSkills(this.value)" style="background:none;border:none;outline:none;color:rgba(255,255,255,0.85);font-size:14px;flex:1;font-family:inherit;">
+          </div>
+        </div>
+        <div id="skHotSection">
+          <div class="sk-sect"><div class="sk-sect-tt">🔥 热门</div></div>
+          <div class="sk-scroll" id="skHotScroll"><!-- filled by JS --></div>
+        </div>
         <div class="sk-sect"><div class="sk-sect-tt">🆕 更多技能</div></div>
-        <div class="sk-list">
-          <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(80,130,220,0.06)">📅</div><div style="flex:1"><div class="sk-list-nm">日程提醒</div><div class="sk-list-desc">会议安排、待办管理</div><div class="sk-list-meta">3.2k · 免费</div></div><button class="sk-btn get" onclick="installSk(this)">安装</button></div>
-          <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(80,180,120,0.06)">🌤️</div><div style="flex:1"><div class="sk-list-nm">天气管家</div><div class="sk-list-desc">出门提醒、穿衣建议</div><div class="sk-list-meta">5.1k · 免费</div></div><button class="sk-btn get" onclick="installSk(this)">安装</button></div>
-          <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(220,160,60,0.06)">💰</div><div style="flex:1"><div class="sk-list-nm">记账助手</div><div class="sk-list-desc">语音记账、消费分析</div><div class="sk-list-meta">2.1k · 订阅</div></div><button class="sk-btn pro">🔒 PRO</button></div>
-          <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(200,80,120,0.06)">🏠</div><div style="flex:1"><div class="sk-list-nm">智能家居</div><div class="sk-list-desc">联动 HA，语音控制</div><div class="sk-list-meta">1.5k · 订阅</div></div><button class="sk-btn pro">🔒 PRO</button></div>
-          <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(140,100,200,0.06)">📖</div><div style="flex:1"><div class="sk-list-nm">阅读摘要</div><div class="sk-list-desc">网页 PDF 一键摘要</div><div class="sk-list-meta">4.3k · 免费</div></div><button class="sk-btn get" onclick="installSk(this)">安装</button></div>
+        <div class="sk-list" id="skMoreList"><!-- filled by JS --></div>
+        <div id="skSearchResults" style="display:none;padding:0 16px;">
+          <div class="sk-sect"><div class="sk-sect-tt">🔍 搜索结果</div></div>
+          <div class="sk-list" id="skSearchList"></div>
         </div>
       </div>
     </div>
@@ -1167,7 +1171,131 @@ function dismissCronDot() { const d=document.getElementById('cronDot'); if(d) d.
 const _origNav = nav;
 nav = function(id) { if(id==='notif') dismissCronDot(); _origNav(id); };
 
-/* Skill install */
+/* === ClawHub Skill Store === */
+const CLAWHUB_API = 'https://clawhub.ai/api/v1';
+let _allSkills = [], _hotSkills = [], _moreSkills = [];
+
+// Chinese translation map for known skills
+const zhNames = {
+  'zhipu-web-search':'智谱搜索','release-manager':'发布管理','subagent-overseer':'子代理监控',
+  'newsriver-intelligence':'新闻情报','emergence':'科学工具','smart-model-router':'智能路由',
+  'binance-coach':'币安教练','demarkus':'持久记忆','finchain-skill':'金融链',
+  'clawlendar':'万年历','openclaw-kindergarten':'技能学校','silmaril-cdp':'浏览器自动化',
+  'news-publisher':'新闻发布','nfc-tools':'NFC工具','dkey-switch':'窗口切换',
+  'agent-superpowers':'超能力检查','pre-flight':'飞行检查','focus-ai':'专注监控',
+  'news-summary':'新闻摘要','cctv-news-fetcher':'央视新闻','weather':'天气查询',
+  'crypto-news':'加密货币新闻','ai-news-zh':'AI科技日报',
+};
+const zhDescs = {
+  'zhipu-web-search':'AI驱动网页搜索','release-manager':'自动化版本发布',
+  'subagent-overseer':'监控子代理运行状态','newsriver-intelligence':'量化情报与资讯',
+  'emergence':'可验证AI协议工具','smart-model-router':'智能分配模型任务',
+  'binance-coach':'加密货币交易辅导','demarkus':'Markdown持久记忆',
+  'finchain-skill':'金融链问答生成','clawlendar':'多历法日期转换',
+  'openclaw-kindergarten':'管理技能夜校','silmaril-cdp':'网页自动化操作',
+  'news-publisher':'一键多平台发布','nfc-tools':'NFC标签读写',
+  'dkey-switch':'快捷窗口页签切换','agent-superpowers':'验证代理执行结果',
+  'pre-flight':'授权前安全检查','focus-ai':'屏幕专注度分析',
+};
+const skillIcons = {
+  'zhipu-web-search':'🔍','release-manager':'🚀','subagent-overseer':'👁️',
+  'newsriver-intelligence':'📊','emergence':'🔬','smart-model-router':'🧠',
+  'binance-coach':'💹','demarkus':'💾','finchain-skill':'⛓️',
+  'clawlendar':'📅','openclaw-kindergarten':'🎓','silmaril-cdp':'🌐',
+  'news-publisher':'📢','nfc-tools':'📡','dkey-switch':'🔀',
+  'agent-superpowers':'⚡','pre-flight':'✈️','focus-ai':'🎯',
+  'news-summary':'📰','cctv-news-fetcher':'📺','weather':'🌤️',
+  'crypto-news':'🪙','ai-news-zh':'🤖',
+};
+
+function fmtDl(n) { return n>=1000?(n/1000).toFixed(1)+'k':n.toString(); }
+function getZhName(s) { return zhNames[s.slug]||s.displayName; }
+function getZhDesc(s) {
+  if(zhDescs[s.slug]) return zhDescs[s.slug];
+  const d=s.summary||''; return d.length>10?d.substring(0,10)+'…':d;
+}
+function getIcon(s) { return skillIcons[s.slug]||'📦'; }
+
+function renderHotCard(s) {
+  return `<div class="sk-card" onclick="openSkillDetail('${s.slug}')">
+    <div class="sk-card-ico">${getIcon(s)}</div>
+    <div class="sk-card-nm">${getZhName(s)}</div>
+    <div class="sk-card-desc">${getZhDesc(s)}</div>
+    <div class="sk-card-ft"><span class="sk-card-cnt">${fmtDl(s.stats?.downloads||0)}</span>
+    <button class="sk-btn get" onclick="event.stopPropagation();installSk(this)">安装</button></div></div>`;
+}
+function renderListItem(s) {
+  return `<div class="sk-list-item" onclick="openSkillDetail('${s.slug}')">
+    <div class="sk-list-ico" style="background:rgba(100,80,200,0.06)">${getIcon(s)}</div>
+    <div style="flex:1"><div class="sk-list-nm">${getZhName(s)}</div>
+    <div class="sk-list-desc">${getZhDesc(s)}</div>
+    <div class="sk-list-meta">${fmtDl(s.stats?.downloads||0)} · 免费</div></div>
+    <button class="sk-btn get" onclick="event.stopPropagation();installSk(this)">安装</button></div>`;
+}
+
+async function loadSkills() {
+  try {
+    const r = await fetch(CLAWHUB_API+'/skills?limit=30');
+    const d = await r.json();
+    _allSkills = (d.items||[]).sort((a,b)=>(b.stats?.downloads||0)-(a.stats?.downloads||0));
+    _hotSkills = _allSkills.slice(0,10);
+    _moreSkills = _allSkills.slice(10);
+    document.getElementById('skHotScroll').innerHTML = _hotSkills.map(renderHotCard).join('');
+    document.getElementById('skMoreList').innerHTML = _moreSkills.map(renderListItem).join('');
+  } catch(e) {
+    // Fallback with cached data
+    document.getElementById('skHotScroll').innerHTML = '<div style="padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">加载中…</div>';
+  }
+}
+
+function filterSkills(q) {
+  const term = q.trim().toLowerCase();
+  if (!term) {
+    document.getElementById('skHotSection').style.display = '';
+    document.getElementById('skMoreList').style.display = '';
+    document.getElementById('skSearchResults').style.display = 'none';
+    return;
+  }
+  document.getElementById('skHotSection').style.display = 'none';
+  document.getElementById('skMoreList').style.display = 'none';
+  document.getElementById('skSearchResults').style.display = '';
+  const matches = _allSkills.filter(s =>
+    (getZhName(s)+s.displayName+s.slug+(s.summary||'')).toLowerCase().includes(term)
+  );
+  document.getElementById('skSearchList').innerHTML = matches.length
+    ? matches.map(renderListItem).join('')
+    : '<div style="padding:40px 0;text-align:center;color:rgba(255,255,255,0.2);font-size:13px;">未找到相关技能</div>';
+}
+
+function openSkillDetail(slug) {
+  const s = _allSkills.find(x=>x.slug===slug);
+  if(!s) return;
+  const detail = `<div style="padding:24px 20px;">
+    <div style="font-size:48px;margin-bottom:16px;">${getIcon(s)}</div>
+    <div style="font-size:20px;font-weight:700;color:rgba(255,255,255,0.9);margin-bottom:4px;">${getZhName(s)}</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:16px;">${s.slug} · v${s.latestVersion?.version||'1.0.0'}</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:20px;">${s.summary||''}</div>
+    <div style="display:flex;gap:24px;margin-bottom:24px;">
+      <div style="text-align:center"><div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.8);">${fmtDl(s.stats?.downloads||0)}</div><div style="font-size:11px;color:rgba(255,255,255,0.3);">下载</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.8);">${s.stats?.stars||0}</div><div style="font-size:11px;color:rgba(255,255,255,0.3);">收藏</div></div>
+      <div style="text-align:center"><div style="font-size:18px;font-weight:600;color:rgba(255,255,255,0.8);">${s.stats?.versions||1}</div><div style="font-size:11px;color:rgba(255,255,255,0.3);">版本</div></div>
+    </div>
+    <button class="sk-btn get" onclick="installSk(this)" style="width:100%;padding:14px;font-size:15px;border-radius:14px;">安装技能</button>
+  </div>`;
+  // Show as overlay
+  const ov = document.createElement('div');
+  ov.className='screen active';
+  ov.style.cssText='position:absolute;inset:0;z-index:200;';
+  ov.innerHTML=`<div class="aurora purple"></div><div class="z">
+    <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
+    <div class="topbar"><div class="topbar-icon" onclick="this.closest('.screen').remove()">←</div><div class="topbar-title">技能详情</div><div style="width:44px"></div></div>
+    <div class="screen-body">${detail}</div></div>`;
+  document.querySelector('.phone-inner').appendChild(ov);
+}
+
+// Load skills on init
+setTimeout(loadSkills, 500);
+
 function installSk(b) { b.textContent='安装中...'; b.className='sk-btn done'; setTimeout(()=>{b.textContent='已安装';toast('✅ 技能安装成功');},800); }
 
 /* Clock */
