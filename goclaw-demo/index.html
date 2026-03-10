@@ -237,50 +237,55 @@ body {
   box-shadow: 0 0 6px rgba(224,80,80,0.4);
 }
 
-/* === Gemini-style Input === */
+/* === Gemini-style Input (single row) === */
 .gem-input {
-  padding: 8px 20px 28px;
+  padding: 8px 12px 28px;
   padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
   flex-shrink: 0;
+  display: flex; align-items: center; gap: 8px;
 }
-.gem-input-field {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+.gem-plus {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; color: rgba(255,255,255,0.4);
+  flex-shrink: 0; cursor: pointer;
+  min-width: 40px; min-height: 40px;
+  transition: background 0.15s;
+}
+.gem-plus:active { background: rgba(255,255,255,0.15); }
+.gem-field {
+  flex: 1; display: flex; align-items: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 24px;
-  padding: 14px 16px;
-  font-size: 15px; color: rgba(255,255,255,0.85);
-  line-height: 1.4;
+  padding: 10px 12px 10px 16px;
+  gap: 8px;
 }
-.gem-input-field input {
+.gem-field input {
   background: none; border: none; outline: none;
   color: rgba(255,255,255,0.85); font-size: 15px;
-  width: 100%; font-family: inherit;
+  flex: 1; font-family: inherit; line-height: 1.4;
+  min-width: 0;
 }
-.gem-input-field input::placeholder { color: rgba(255,255,255,0.2); }
-.gem-input-tools {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 4px 0;
+.gem-field input::placeholder { color: rgba(255,255,255,0.2); }
+.gem-field-mic {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: rgba(255,255,255,0.3);
+  flex-shrink: 0; cursor: pointer;
 }
-.gem-tool {
+.gem-voice {
   width: 40px; height: 40px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; color: rgba(255,255,255,0.35);
-  cursor: pointer; transition: background 0.15s, transform 0.1s;
-  min-height: 44px; min-width: 44px;
-}
-.gem-tool:active { background: rgba(255,255,255,0.08); transform: scale(0.9); }
-.gem-mic {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.12);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; color: rgba(255,255,255,0.5);
-  cursor: pointer; transition: background 0.2s, border-color 0.2s;
-}
-.gem-mic:active, .gem-mic.recording {
   background: rgba(100,80,200,0.2);
-  border-color: rgba(100,80,200,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: rgba(180,160,240,0.9);
+  flex-shrink: 0; cursor: pointer;
+  min-width: 40px; min-height: 40px;
+  transition: background 0.2s, transform 0.1s;
 }
-.gem-mic.recording { animation: mic-pulse 1s infinite; }
+.gem-voice:active { background: rgba(100,80,200,0.4); transform: scale(0.9); }
+.gem-voice.recording { animation: mic-pulse 1s infinite; }
 @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(100,80,200,0.3)} 50%{box-shadow:0 0 0 12px rgba(100,80,200,0)} }
 
 /* === Tab Bar (iOS standard: 49pt + safe area 34pt = 83pt) === */
@@ -908,19 +913,16 @@ body {
           <div class="msg bot"><div class="msg-av">🦞</div><div class="msg-bbl">☀️ 早安！今日要闻：<div style="margin-top:10px"><div class="news-item"><span class="news-tag tech">科技</span><span class="news-txt">OpenAI 发布 GPT-6，推理能力 ×3</span></div><div class="news-item"><span class="news-tag fin">财经</span><span class="news-txt">A 股三大指数高开，半导体领涨</span></div><div class="news-item"><span class="news-tag soc">社会</span><span class="news-txt">北京发布暴雨蓝色预警</span></div></div></div></div>
         </div>
       </div>
-      <!-- Gemini-style input bar -->
+      <!-- Gemini-style input bar (single row) -->
       <div class="gem-input">
-        <div class="gem-input-field">
-          <input type="text" placeholder="问问 GoClaw..." id="chatIn" onkeydown="if(event.key==='Enter')sendMsg()">
+        <div class="gem-plus" onclick="toast('📎 选择文件/照片')">＋</div>
+        <div class="gem-field">
+          <input type="text" placeholder="询问任何问题" id="chatIn" onkeydown="if(event.key==='Enter')sendMsg()">
+          <div class="gem-field-mic" onclick="sendMsg()">🎙️</div>
         </div>
-        <div class="gem-input-tools">
-          <div style="display:flex;gap:4px;">
-            <div class="gem-tool" onclick="toast('📎 选择文件/照片')">＋</div>
-          </div>
-          <div class="gem-mic" id="micBtn"
-            onmousedown="micStart()" onmouseup="micEnd()" onmouseleave="micEnd()"
-            ontouchstart="micStart()" ontouchend="micEnd()">🎤</div>
-        </div>
+        <div class="gem-voice" id="micBtn"
+          onmousedown="micStart()" onmouseup="micEnd()" onmouseleave="micEnd()"
+          ontouchstart="micStart()" ontouchend="micEnd()">🎤</div>
       </div>
     </div>
   </div>
@@ -930,7 +932,7 @@ body {
     <div class="aurora cool"></div>
     <div class="z">
       <div class="statusbar"><span>08:00</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">定时任务</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">定时任务</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div style="padding:16px 16px 20px;">
           <div class="ncard"><div class="ncard-hd"><div class="ncard-ic news">📰</div><div><div class="ncard-tt">资讯早报</div><div class="ncard-tm">今天 08:00</div></div></div><div class="ncard-bd">☀️ 早安，今日要闻（3月10日）：<ul style="padding-left:16px;margin-top:6px"><li><b style="color:#6BA3F7">【科技】</b>OpenAI 发布 GPT-6</li><li><b style="color:#E8B040">【财经】</b>A 股半导体领涨</li><li><b style="color:#5EC090">【社会】</b>北京暴雨预警</li><li><b style="color:#60A5FA">【国际】</b>欧盟 AI 监管新框架</li></ul></div></div>
