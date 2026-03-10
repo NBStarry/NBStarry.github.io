@@ -622,6 +622,61 @@ body {
 .pf-item-nm { font-size: 14px; color: rgba(255,255,255,0.7); flex: 1; }
 .pf-item-arr { color: rgba(255,255,255,0.08); font-size: 16px; }
 
+/* === Drawer === */
+.drawer-overlay {
+  position: absolute; inset: 0; z-index: 50;
+  background: rgba(0,0,0,0.5);
+  opacity: 0; transition: opacity 0.25s;
+  pointer-events: none;
+}
+.drawer-overlay.on { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: absolute; top: 0; bottom: 0; left: 0; z-index: 51;
+  width: 78%; max-width: 300px;
+  background: #0c0c14;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.2,0.9,0.3,1);
+  display: flex; flex-direction: column;
+  padding-top: env(safe-area-inset-top, 54px);
+}
+.drawer.on { transform: translateX(0); }
+.drawer-hd {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 22px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.drawer-av {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(100,80,200,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: #B8A0F0;
+}
+.drawer-user { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.drawer-email { font-size: 12px; color: rgba(255,255,255,0.2); margin-top: 2px; }
+.drawer-body { flex: 1; padding-top: 8px; overflow-y: auto; }
+.drawer-sect { padding: 0 12px; margin-bottom: 8px; }
+.drawer-sect-tt {
+  font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.15);
+  padding: 8px 10px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.drawer-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 10px; border-radius: 12px;
+  cursor: pointer; min-height: 44px;
+  transition: background 0.15s;
+}
+.drawer-item:active { background: rgba(255,255,255,0.04); }
+.drawer-item-ic { width: 28px; text-align: center; font-size: 18px; }
+.drawer-item-nm { font-size: 15px; color: rgba(255,255,255,0.65); }
+.drawer-ft {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 22px; min-height: 52px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  cursor: pointer;
+}
+.drawer-ft:active { background: rgba(255,255,255,0.04); }
+
 /* === Toast === */
 .toast {
   position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
@@ -649,6 +704,37 @@ body {
 <div id="app">
   <div class="toast" id="toast"></div>
 
+  <!-- Drawer -->
+  <div class="drawer-overlay" id="drawerOv" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-hd">
+      <div class="drawer-av">G</div>
+      <div><div class="drawer-user">GoClaw 用户</div><div class="drawer-email">user@example.com</div></div>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-sect">
+        <div class="drawer-item" onclick="closeDrawer()"><div class="drawer-item-ic">💬</div><div class="drawer-item-nm">新对话</div></div>
+      </div>
+      <div class="drawer-sect">
+        <div class="drawer-sect-tt">历史对话</div>
+        <div class="drawer-item"><div class="drawer-item-ic">💭</div><div class="drawer-item-nm" style="color:rgba(255,255,255,0.3)">今天的对话记录...</div></div>
+      </div>
+      <div class="drawer-sect">
+        <div class="drawer-sect-tt">功能</div>
+        <div class="drawer-item" onclick="drawerNav('skill')"><div class="drawer-item-ic">📦</div><div class="drawer-item-nm">技能商城</div></div>
+        <div class="drawer-item" onclick="drawerNav('device')"><div class="drawer-item-ic">📱</div><div class="drawer-item-nm">设备管理</div></div>
+        <div class="drawer-item" onclick="drawerNav('notif')"><div class="drawer-item-ic">🔔</div><div class="drawer-item-nm">通知中心</div></div>
+      </div>
+      <div class="drawer-sect">
+        <div class="drawer-sect-tt">账户</div>
+        <div class="drawer-item" onclick="drawerNav('email-cfg')"><div class="drawer-item-ic">📧</div><div class="drawer-item-nm">邮箱配置</div></div>
+        <div class="drawer-item" onclick="drawerNav('sub')"><div class="drawer-item-ic">💎</div><div class="drawer-item-nm">订阅管理</div></div>
+        <div class="drawer-item" onclick="toast('⚙️ 设置功能开发中')"><div class="drawer-item-ic">⚙️</div><div class="drawer-item-nm">设置</div></div>
+      </div>
+    </div>
+    <div class="drawer-ft" onclick="drawerNav('profile')"><div class="drawer-item-ic">👤</div><div class="drawer-item-nm">我的</div></div>
+  </div>
+
   <!-- Voice Overlay -->
   <div class="voice-ov" id="voiceOv">
     <div class="aurora warm"></div>
@@ -671,8 +757,8 @@ body {
     </div>
   </div>
 
-  <!-- ===== 1. Welcome ===== -->
-  <div class="screen active" id="s-welcome">
+  <!-- ===== 1. Welcome (hidden, kept for reference) ===== -->
+  <div class="screen" id="s-welcome">
     <div class="aurora default"></div>
     <div class="z">
       <div class="statusbar"><span>12:36</span><span>📶 🔋64</span></div>
@@ -742,15 +828,15 @@ body {
     </div>
   </div>
 
-  <!-- ===== 3. Chat ===== -->
-  <div class="screen" id="s-chat">
+  <!-- ===== 3. Chat (Home Screen) ===== -->
+  <div class="screen active" id="s-chat">
     <div class="aurora default"></div>
     <div class="z">
       <div class="statusbar"><span id="clk">09:35</span><span>📶 🔋64</span></div>
       <div class="topbar">
-        <div class="topbar-icon" onclick="nav('notif')">🔔</div>
+        <div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div>
         <div class="topbar-title">GoClaw</div>
-        <div class="topbar-action" onclick="tab('skill')">⚡ 技能</div>
+        <div class="topbar-icon" onclick="toast('✏️ 新对话')">✏️</div>
       </div>
       <div style="display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;flex-shrink:0;">
         <div class="qchip" onclick="quickSend('今日资讯')"><div class="qchip-icon chip-icon blue">📰</div> 今日资讯</div>
@@ -772,12 +858,6 @@ body {
           <div class="inputbar-btn" onclick="openVoice()">🎤</div>
           <div class="inputbar-btn" onclick="sendMsg()">➤</div>
         </div>
-      </div>
-      <div class="tabbar">
-        <div class="tab on" onclick="tab('chat')"><span class="tab-ico">💬</span>对话<div class="tab-dot"></div></div>
-        <div class="tab" onclick="tab('skill')"><span class="tab-ico">📦</span>技能<div class="tab-dot"></div></div>
-        <div class="tab" onclick="tab('device')"><span class="tab-ico">📱</span>设备<div class="tab-dot"></div></div>
-        <div class="tab" onclick="tab('profile')"><span class="tab-ico">👤</span>我的<div class="tab-dot"></div></div>
       </div>
     </div>
   </div>
@@ -803,6 +883,7 @@ body {
     <div class="aurora purple"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
+      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">技能商城</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="sk-banner"><h2>📦 技能商城</h2></div>
         <div class="sk-search">🔍 搜索技能...</div>
@@ -816,7 +897,6 @@ body {
           <div class="sk-list-item"><div class="sk-list-ico" style="background:rgba(140,100,200,0.06)">📖</div><div style="flex:1"><div class="sk-list-nm">阅读摘要</div><div class="sk-list-desc">网页 PDF 一键摘要</div><div class="sk-list-meta">4.3k · 免费</div></div><button class="sk-btn get" onclick="installSk(this)">安装</button></div>
         </div>
       </div>
-      <div class="tabbar"><div class="tab" onclick="tab('chat')"><span class="tab-ico">💬</span>对话<div class="tab-dot"></div></div><div class="tab on" onclick="tab('skill')"><span class="tab-ico">📦</span>技能<div class="tab-dot"></div></div><div class="tab" onclick="tab('device')"><span class="tab-ico">📱</span>设备<div class="tab-dot"></div></div><div class="tab" onclick="tab('profile')"><span class="tab-ico">👤</span>我的<div class="tab-dot"></div></div></div>
     </div>
   </div>
 
@@ -825,12 +905,11 @@ body {
     <div class="aurora cool"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div style="width:44px"></div><div class="topbar-title">设备</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">设备</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="dev-card"><div class="dev-box"><div class="dev-led"></div></div><div class="dev-nm">客厅的 GoClaw</div><div class="dev-mdl">GoClaw Mini · GC-2026-A001</div><div class="dev-stats"><div><div class="dev-stat-v" style="color:#40C090">在线</div><div class="dev-stat-l">状态</div></div><div><div class="dev-stat-v">72h</div><div class="dev-stat-l">运行</div></div><div><div class="dev-stat-v">3</div><div class="dev-stat-l">技能</div></div></div></div>
         <div class="dev-actions"><div class="dev-sect-tt">设备操作</div><div class="dev-act" onclick="toast('已连接 Home_WiFi_5G')"><div class="dev-act-ic" style="background:rgba(80,130,220,0.06)">📡</div><div><div class="dev-act-nm">网络设置</div><div class="dev-act-desc">Home_WiFi_5G</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('v1.0.0 已是最新版本')"><div class="dev-act-ic" style="background:rgba(80,180,120,0.06)">🔄</div><div><div class="dev-act-nm">检查更新</div><div class="dev-act-desc">v1.0.0 · 已是最新</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('设备重启中...')"><div class="dev-act-ic" style="background:rgba(220,160,60,0.06)">🔁</div><div><div class="dev-act-nm">远程重启</div><div class="dev-act-desc">重启设备</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('⚠️ 请在设置中确认')"><div class="dev-act-ic" style="background:rgba(220,60,60,0.06)">⚠️</div><div><div class="dev-act-nm">恢复出厂</div><div class="dev-act-desc">清除所有数据</div></div><span class="dev-act-arr">›</span></div></div>
       </div>
-      <div class="tabbar"><div class="tab" onclick="tab('chat')"><span class="tab-ico">💬</span>对话<div class="tab-dot"></div></div><div class="tab" onclick="tab('skill')"><span class="tab-ico">📦</span>技能<div class="tab-dot"></div></div><div class="tab on" onclick="tab('device')"><span class="tab-ico">📱</span>设备<div class="tab-dot"></div></div><div class="tab" onclick="tab('profile')"><span class="tab-ico">👤</span>我的<div class="tab-dot"></div></div></div>
     </div>
   </div>
 
@@ -839,7 +918,7 @@ body {
     <div class="aurora purple"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div style="width:44px"></div><div class="topbar-title">我的</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">我的</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="pf-av">🦞</div>
         <div class="pf-nm">GoClaw 用户</div>
@@ -852,7 +931,6 @@ body {
           <div class="pf-item" onclick="toast('关于 GoClaw v1.0.0')"><div class="pf-item-ic" style="background:rgba(255,255,255,0.03)">ℹ️</div><div class="pf-item-nm">关于</div><span class="pf-item-arr">›</span></div>
         </div>
       </div>
-      <div class="tabbar"><div class="tab" onclick="tab('chat')"><span class="tab-ico">💬</span>对话<div class="tab-dot"></div></div><div class="tab" onclick="tab('skill')"><span class="tab-ico">📦</span>技能<div class="tab-dot"></div></div><div class="tab" onclick="tab('device')"><span class="tab-ico">📱</span>设备<div class="tab-dot"></div></div><div class="tab on" onclick="tab('profile')"><span class="tab-ico">👤</span>我的<div class="tab-dot"></div></div></div>
     </div>
   </div>
 
@@ -877,8 +955,11 @@ body {
 <script>
 /* Navigation */
 function nav(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('s-'+id).classList.add('active'); }
-const tabMap = {chat:'对话',skill:'技能',device:'设备',profile:'我的'};
-function tab(id) { nav(id); document.getElementById('s-'+id).querySelectorAll('.tab').forEach(t=>{ t.classList.toggle('on', t.textContent.includes(tabMap[id])); }); }
+
+/* Drawer */
+function openDrawer() { document.getElementById('drawer').classList.add('on'); document.getElementById('drawerOv').classList.add('on'); }
+function closeDrawer() { document.getElementById('drawer').classList.remove('on'); document.getElementById('drawerOv').classList.remove('on'); }
+function drawerNav(id) { closeDrawer(); setTimeout(()=>nav(id),200); }
 
 /* Toast */
 let _tt;
