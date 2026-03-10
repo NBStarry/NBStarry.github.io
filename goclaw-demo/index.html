@@ -420,6 +420,59 @@ body {
 }
 
 /* === Skill Store === */
+/* === Auth / Login === */
+.auth-input-row {
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px; overflow: hidden;
+  min-height: 52px;
+}
+.auth-prefix {
+  padding: 0 14px; font-size: 14px; color: rgba(255,255,255,0.5);
+  white-space: nowrap; cursor: pointer;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  min-height: 52px; display: flex; align-items: center; gap: 4px;
+}
+.auth-input {
+  flex: 1; background: none; border: none; outline: none;
+  padding: 0 16px; font-size: 16px; color: rgba(255,255,255,0.85);
+  font-family: inherit; height: 52px;
+}
+.auth-input::placeholder { color: rgba(255,255,255,0.15); }
+.auth-sms-btn {
+  padding: 0 16px; font-size: 13px; color: rgba(100,80,200,0.8);
+  white-space: nowrap; cursor: pointer; min-height: 52px;
+  display: flex; align-items: center;
+  transition: opacity 0.15s;
+}
+.auth-sms-btn.disabled { color: rgba(255,255,255,0.15); pointer-events: none; }
+.auth-btn {
+  width: 100%; padding: 16px; text-align: center;
+  background: linear-gradient(135deg, rgba(100,80,200,0.8), rgba(140,100,240,0.7));
+  border-radius: 14px; font-size: 16px; font-weight: 600;
+  color: #fff; cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.auth-btn:active { transform: scale(0.98); }
+.auth-social {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer;
+}
+.auth-social:active { opacity: 0.7; }
+.auth-check {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: transparent; margin-top: 2px;
+  transition: all 0.15s;
+}
+.auth-check.checked {
+  background: rgba(100,80,200,0.6);
+  border-color: rgba(100,80,200,0.6);
+  color: #fff;
+}
+
 .sk-search-bar {
   display: flex; align-items: center; gap: 8px;
   padding: 12px 16px;
@@ -814,40 +867,65 @@ body {
     </div>
   </div>
 
-  <!-- ===== 1. Welcome (hidden, kept for reference) ===== -->
-  <div class="screen" id="s-welcome">
+  <!-- ===== 1. Login ===== -->
+  <div class="screen active" id="s-login">
     <div class="aurora default"></div>
     <div class="z">
       <div class="statusbar"><span>12:36</span><span>📶 🔋64</span></div>
-      <div class="topbar">
-        <div style="width:44px"></div>
-        <div class="topbar-title">GoClaw</div>
-        <div class="topbar-action">⚡ 技能</div>
-      </div>
-      <div class="ob-hero">
-        <div class="ob-greeting">Hi, 朋友</div>
-        <div class="ob-sub">你的 AI 管家已就绪</div>
-      </div>
-      <div class="ob-chips">
-        <div class="chip" onclick="toast('📰 资讯技能已就绪')"><div class="chip-icon blue">📰</div> 每日资讯速览</div>
-        <div class="chip" onclick="toast('📈 行情技能已就绪')"><div class="chip-icon green">📈</div> 看看今天行情</div>
-        <div class="chip" onclick="toast('📧 邮件技能已就绪')"><div class="chip-icon purple">📧</div> 帮我查邮件</div>
-        <div class="chip" onclick="toast('🎯 前往技能商城')"><div class="chip-icon orange">🎯</div> 选择更多技能</div>
-        <div class="chip" onclick="toast('🖼️ 拍照识别功能')"><div class="chip-icon pink">🖼️</div> 传图帮你看看</div>
-        <div class="chip highlight" onclick="toast('🔥 加载热点中...')"><div class="chip-icon cyan">🔥</div> 近期热点速看</div>
-      </div>
-      <div class="inputbar">
-        <div class="inputbar-inner">
-          <div class="inputbar-field">
-            <div class="inputbar-lobster">🦞</div>
-            <input type="text" placeholder="问一问 GoClaw" readonly onclick="nav('email-cfg')">
+      <div style="flex:1;display:flex;flex-direction:column;padding:0 28px;">
+        <!-- Logo + brand -->
+        <div style="padding-top:80px;margin-bottom:48px;">
+          <div style="width:64px;height:64px;border-radius:20px;background:rgba(100,80,200,0.15);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px;">🦞</div>
+          <div style="font-size:28px;font-weight:800;color:rgba(255,255,255,0.9);">欢迎使用 GoClaw</div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.25);margin-top:8px;">你的 AI 私人管家</div>
+        </div>
+        <!-- Phone input -->
+        <div style="margin-bottom:16px;">
+          <div class="auth-input-row">
+            <div class="auth-prefix" onclick="toast('🇨🇳 +86')">🇨🇳 +86 <span style="font-size:10px;color:rgba(255,255,255,0.2);">▼</span></div>
+            <input type="tel" id="loginPhone" class="auth-input" placeholder="请输入手机号" maxlength="11" oninput="checkPhone()">
           </div>
-          <div class="inputbar-btn">🎤</div>
-          <div class="inputbar-btn">👁</div>
+        </div>
+        <!-- SMS code row -->
+        <div class="auth-input-row" id="smsRow" style="display:none;margin-bottom:24px;">
+          <input type="text" id="loginCode" class="auth-input" placeholder="请输入验证码" maxlength="6" oninput="checkCode()" inputmode="numeric">
+          <div class="auth-sms-btn" id="smsBtn" onclick="sendSms()">获取验证码</div>
+        </div>
+        <!-- Login button -->
+        <div class="auth-btn" id="loginBtn" onclick="doLogin()" style="opacity:0.4;pointer-events:none;">登录 / 注册</div>
+        <!-- Divider -->
+        <div style="display:flex;align-items:center;gap:12px;margin:28px 0;">
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.04);"></div>
+          <span style="font-size:12px;color:rgba(255,255,255,0.15);">其他登录方式</span>
+          <div style="flex:1;height:1px;background:rgba(255,255,255,0.04);"></div>
+        </div>
+        <!-- Social login -->
+        <div style="display:flex;justify-content:center;gap:32px;">
+          <div class="auth-social" onclick="toast('微信授权登录中...');setTimeout(()=>{nav('chat');toast('✅ 微信登录成功')},1000)">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(80,180,80,0.12);display:flex;align-items:center;justify-content:center;font-size:24px;">💬</div>
+            <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px;">微信</span>
+          </div>
+          <div class="auth-social" onclick="toast('Apple 登录暂未开放')">
+            <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:24px;">🍎</div>
+            <span style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:6px;">Apple</span>
+          </div>
+        </div>
+        <!-- Spacer -->
+        <div style="flex:1;"></div>
+        <!-- Agreement -->
+        <div style="padding-bottom:40px;text-align:center;">
+          <label style="display:inline-flex;align-items:flex-start;gap:6px;cursor:pointer;" onclick="toggleAgree()">
+            <div class="auth-check" id="agreeCheck">✓</div>
+            <span style="font-size:11px;color:rgba(255,255,255,0.2);line-height:1.5;">登录即表示同意
+              <span style="color:rgba(100,80,200,0.6);" onclick="event.stopPropagation();toast('《用户协议》')">《用户协议》</span>和<span style="color:rgba(100,80,200,0.6);" onclick="event.stopPropagation();toast('《隐私政策》')">《隐私政策》</span></span>
+          </label>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- ===== 1b. Welcome (kept for reference, not shown) ===== -->
+  <div class="screen" id="s-welcome" style="display:none;"></div>
 
   <!-- ===== 2. Email Config ===== -->
   <div class="screen" id="s-email-cfg">
@@ -886,7 +964,7 @@ body {
   </div>
 
   <!-- ===== 3. Chat (Home Screen) ===== -->
-  <div class="screen active" id="s-chat">
+  <div class="screen" id="s-chat">
     <div class="aurora default"></div>
     <div class="z">
       <div class="statusbar"><span id="clk">09:35</span><span>📶 🔋64</span></div>
@@ -1346,13 +1424,77 @@ function editNickname() {
 function logout() {
   if(confirm('确定退出登录？')) {
     toast('👋 已退出登录');
-    setTimeout(()=> nav('welcome'), 500);
+    setTimeout(()=> nav('login'), 500);
   }
 }
 
 /* Clock */
 function tick() { const n=new Date(); document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
 tick(); setInterval(tick,60000);
+/* === Auth / Login Logic === */
+let _agreed = false, _smsSent = false, _smsTimer = 0;
+function toggleAgree() {
+  _agreed = !_agreed;
+  document.getElementById('agreeCheck').className = 'auth-check' + (_agreed ? ' checked' : '');
+  updateLoginBtn();
+}
+function checkPhone() {
+  const v = document.getElementById('loginPhone').value.replace(/\D/g,'');
+  document.getElementById('loginPhone').value = v;
+  if (v.length === 11 && !_smsSent) {
+    document.getElementById('smsRow').style.display = 'flex';
+  }
+  updateLoginBtn();
+}
+function checkCode() {
+  const v = document.getElementById('loginCode').value.replace(/\D/g,'');
+  document.getElementById('loginCode').value = v;
+  updateLoginBtn();
+}
+function updateLoginBtn() {
+  const phone = (document.getElementById('loginPhone').value||'').length === 11;
+  const code = (document.getElementById('loginCode').value||'').length >= 4;
+  const ok = phone && code && _agreed;
+  const btn = document.getElementById('loginBtn');
+  btn.style.opacity = ok ? '1' : '0.4';
+  btn.style.pointerEvents = ok ? 'auto' : 'none';
+}
+function sendSms() {
+  if (_smsTimer > 0) return;
+  _smsSent = true;
+  document.getElementById('smsRow').style.display = 'flex';
+  toast('📱 验证码已发送');
+  _smsTimer = 60;
+  const btn = document.getElementById('smsBtn');
+  btn.className = 'auth-sms-btn disabled';
+  const tick = () => {
+    if (_smsTimer <= 0) { btn.textContent = '重新获取'; btn.className = 'auth-sms-btn'; return; }
+    btn.textContent = _smsTimer + 's';
+    _smsTimer--;
+    setTimeout(tick, 1000);
+  };
+  tick();
+}
+function doLogin() {
+  const phone = document.getElementById('loginPhone').value;
+  const code = document.getElementById('loginCode').value;
+  if (phone.length !== 11 || code.length < 4 || !_agreed) return;
+  document.getElementById('loginBtn').textContent = '登录中...';
+  document.getElementById('loginBtn').style.opacity = '0.6';
+  setTimeout(() => {
+    // Update drawer user info
+    const masked = phone.slice(0,3) + '****' + phone.slice(7);
+    document.getElementById('drawerUserName').textContent = masked;
+    document.getElementById('drawerUserEmail').textContent = '';
+    document.getElementById('pfNickText').textContent = masked;
+    toast('✅ 登录成功');
+    nav('chat');
+    // Reset
+    document.getElementById('loginBtn').textContent = '登录 / 注册';
+    document.getElementById('loginBtn').style.opacity = '1';
+  }, 800);
+}
+
 // Init chat history on load
 initHistory();
 // Pull-to-load on scroll
