@@ -901,9 +901,10 @@ body {
         </div>
       </div>
       <div class="screen-body" id="chatScroll">
+        <div id="pullHint" style="text-align:center;padding:12px 0 4px;font-size:12px;color:rgba(255,255,255,0.2);display:none;">↑ 下拉加载更多</div>
+        <div id="loadingMore" style="text-align:center;padding:12px 0 4px;font-size:12px;color:rgba(255,255,255,0.3);display:none;">加载中...</div>
         <div class="chat-area" id="chatArea">
-          <div class="msg-time">今天 08:00</div>
-          <div class="msg bot"><div class="msg-av">🦞</div><div class="msg-bbl">☀️ 早安！今日要闻：<div style="margin-top:10px"><div class="news-item"><span class="news-tag tech">科技</span><span class="news-txt">OpenAI 发布 GPT-6，推理能力 ×3</span></div><div class="news-item"><span class="news-tag fin">财经</span><span class="news-txt">A 股三大指数高开，半导体领涨</span></div><div class="news-item"><span class="news-tag soc">社会</span><span class="news-txt">北京发布暴雨蓝色预警</span></div></div></div></div>
+          <!-- messages loaded from history -->
         </div>
       </div>
       <!-- Gemini-style input bar -->
@@ -1033,12 +1034,104 @@ const replies = {
 const fallback = ['收到！让我帮你看看... 🦞','好的，正在处理你的请求...','这个问题很有趣 🤔','已收到，马上查。','没问题！'];
 let _tc = 0;
 
+/* === Chat History (localStorage) === */
+const STORE_KEY = 'goclaw_chat_history';
+const COLD_START_COUNT = 5;
+const LOAD_MORE_COUNT = 10;
+let _loadedCount = 0;
+
+// Seed data for first-time users
+const seedMessages = [
+  {type:'time', html:'昨天 14:20', ts: Date.now()-86400000*2},
+  {type:'usr', html:'帮我查一下最近的科技新闻', ts: Date.now()-86400000*2+100},
+  {type:'bot', html:'好的，为你整理了最近的科技热点：<br>1. 苹果 WWDC 2026 发布 iOS 20<br>2. 英伟达发布 RTX 6090<br>3. 量子计算突破 1000 量子比特', ts: Date.now()-86400000*2+200},
+  {type:'time', html:'昨天 19:30', ts: Date.now()-86400000+100},
+  {type:'usr', html:'明天天气怎么样', ts: Date.now()-86400000+200},
+  {type:'bot', html:'上海明天：☀️ 晴转多云，18-25°C，东南风 2-3 级。适合户外活动。', ts: Date.now()-86400000+300},
+  {type:'usr', html:'A股今天收盘情况', ts: Date.now()-86400000+400},
+  {type:'bot', html:'A股收盘：<br>上证 3,245 <span style="color:#5EC090">+0.52%</span><br>深证 10,780 <span style="color:#5EC090">+0.87%</span><br>创业板 2,130 <span style="color:#E05050">-0.23%</span>', ts: Date.now()-86400000+500},
+  {type:'time', html:'今天 08:00', ts: Date.now()-3600000*2},
+  {type:'bot', html:'☀️ 早安！今日要闻：<div style="margin-top:10px"><div class="news-item"><span class="news-tag tech">科技</span><span class="news-txt">OpenAI 发布 GPT-6，推理能力 ×3</span></div><div class="news-item"><span class="news-tag fin">财经</span><span class="news-txt">A 股三大指数高开，半导体领涨</span></div><div class="news-item"><span class="news-tag soc">社会</span><span class="news-txt">北京发布暴雨蓝色预警</span></div></div>', ts: Date.now()-3600000*2+100},
+  {type:'usr', html:'今天有什么新邮件', ts: Date.now()-3600000},
+  {type:'bot', html:'找到 3 封新邮件：<br><br>📧 <b>Q2 项目进度</b><br><span style="color:rgba(255,255,255,0.25)">张总 · 08:52 · ⚠️重要</span><br>摘要：请本周五前提交阶段报告<br><br>📧 <b>团建方案投票</b><br><span style="color:rgba(255,255,255,0.25)">李经理 · 09:10</span>', ts: Date.now()-3600000+100},
+];
+
+function getHistory() {
+  try { const d=localStorage.getItem(STORE_KEY); return d?JSON.parse(d):null; } catch(e){ return null; }
+}
+function saveHistory(msgs) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(msgs)); } catch(e){}
+}
+function initHistory() {
+  let history = getHistory();
+  if (!history || history.length === 0) { history = seedMessages; saveHistory(history); }
+  // Cold start: show last N messages
+  const recent = history.slice(-COLD_START_COUNT);
+  _loadedCount = recent.length;
+  renderMessages(recent, false);
+  // Show pull hint if more history available
+  if (history.length > COLD_START_COUNT) {
+    document.getElementById('pullHint').style.display = 'block';
+  }
+  setTimeout(()=>{ document.getElementById('chatScroll').scrollTop = 999999; }, 50);
+}
+
+function renderMessages(msgs, prepend) {
+  const area = document.getElementById('chatArea');
+  const frag = document.createDocumentFragment();
+  msgs.forEach(m => {
+    const d = document.createElement('div');
+    if (m.type === 'time') {
+      d.className = 'msg-time'; d.textContent = m.html;
+    } else {
+      d.className = 'msg ' + (m.type === 'usr' ? 'usr' : 'bot');
+      d.innerHTML = '<div class="msg-av">'+(m.type==='bot'?'🦞':'👤')+'</div><div class="msg-bbl">'+m.html+'</div>';
+    }
+    frag.appendChild(d);
+  });
+  if (prepend && area.firstChild) {
+    area.insertBefore(frag, area.firstChild);
+  } else {
+    area.appendChild(frag);
+  }
+}
+
+function loadMoreHistory() {
+  const history = getHistory() || [];
+  if (_loadedCount >= history.length) return;
+  document.getElementById('loadingMore').style.display = 'block';
+  document.getElementById('pullHint').style.display = 'none';
+  const scroll = document.getElementById('chatScroll');
+  const prevH = scroll.scrollHeight;
+  setTimeout(() => {
+    const remaining = history.length - _loadedCount;
+    const batch = Math.min(LOAD_MORE_COUNT, remaining);
+    const startIdx = history.length - _loadedCount - batch;
+    const older = history.slice(startIdx, startIdx + batch);
+    _loadedCount += batch;
+    renderMessages(older, true);
+    document.getElementById('loadingMore').style.display = 'none';
+    // Keep scroll position stable
+    scroll.scrollTop = scroll.scrollHeight - prevH;
+    // Hide hint if no more
+    if (_loadedCount >= history.length) {
+      document.getElementById('pullHint').style.display = 'none';
+    } else {
+      document.getElementById('pullHint').style.display = 'block';
+    }
+  }, 400);
+}
+
 function addMsg(html, type) {
   const a = document.getElementById('chatArea'), d = document.createElement('div');
   d.className = 'msg ' + type;
   d.innerHTML = '<div class="msg-av">'+(type==='bot'?'🦞':'👤')+'</div><div class="msg-bbl">'+html+'</div>';
   a.appendChild(d);
   document.getElementById('chatScroll').scrollTop = 999999;
+  // Persist to history
+  const history = getHistory() || [];
+  history.push({type: type==='usr'?'usr':'bot', html, ts: Date.now()});
+  saveHistory(history);
 }
 function addDots() {
   const id='_d'+(++_tc), a=document.getElementById('chatArea'), d=document.createElement('div');
@@ -1051,7 +1144,6 @@ function sendMsg() {
   addMsg(t,'usr');
   setTimeout(()=>{ const did=addDots(); setTimeout(()=>{ const e=document.getElementById(did); if(e)e.remove(); addMsg(replies[t]||fallback[Math.floor(Math.random()*fallback.length)],'bot'); },800+Math.random()*800); },200);
 }
-function quickSend(t) { document.getElementById('chatIn').value=t; sendMsg(); }
 
 /* Voice — long press mic */
 let _micTimer, _micOn=false;
@@ -1081,6 +1173,11 @@ function installSk(b) { b.textContent='安装中...'; b.className='sk-btn done';
 /* Clock */
 function tick() { const n=new Date(); document.getElementById('clk').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
 tick(); setInterval(tick,60000);
+// Init chat history on load
+initHistory();
+// Pull-to-load on scroll
+const _cs=document.getElementById('chatScroll');
+if(_cs) _cs.addEventListener('scroll', function(){ if(_cs.scrollTop<=5) loadMoreHistory(); });
 </script>
 </body>
 </html>
