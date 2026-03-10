@@ -713,11 +713,7 @@ body {
     </div>
     <div class="drawer-body">
       <div class="drawer-sect">
-        <div class="drawer-item" onclick="closeDrawer()"><div class="drawer-item-ic">💬</div><div class="drawer-item-nm">新对话</div></div>
-      </div>
-      <div class="drawer-sect">
-        <div class="drawer-sect-tt">历史对话</div>
-        <div class="drawer-item"><div class="drawer-item-ic">💭</div><div class="drawer-item-nm" style="color:rgba(255,255,255,0.3)">今天的对话记录...</div></div>
+        <div class="drawer-item" onclick="drawerNav('chat')"><div class="drawer-item-ic">💬</div><div class="drawer-item-nm">对话</div></div>
       </div>
       <div class="drawer-sect">
         <div class="drawer-sect-tt">功能</div>
@@ -798,7 +794,7 @@ body {
     <div class="z">
       <div class="statusbar"><span>12:37</span><span>📶 🔋64</span></div>
       <div class="topbar">
-        <div class="topbar-icon" onclick="nav('welcome')">←</div>
+        <div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div>
         <div class="topbar-title">配置邮箱</div>
         <div style="width:44px"></div>
       </div>
@@ -836,7 +832,7 @@ body {
       <div class="topbar">
         <div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div>
         <div class="topbar-title">GoClaw</div>
-        <div class="topbar-icon" onclick="toast('✏️ 新对话')">✏️</div>
+        <div style="width:44px"></div>
       </div>
       <div style="display:flex;gap:8px;padding:0 20px 10px;overflow-x:auto;flex-shrink:0;">
         <div class="qchip" onclick="quickSend('今日资讯')"><div class="qchip-icon chip-icon blue">📰</div> 今日资讯</div>
@@ -867,7 +863,7 @@ body {
     <div class="aurora cool"></div>
     <div class="z">
       <div class="statusbar"><span>08:00</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">通知</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">通知</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div style="padding:16px 16px 20px;">
           <div class="ncard"><div class="ncard-hd"><div class="ncard-ic news">📰</div><div><div class="ncard-tt">资讯早报</div><div class="ncard-tm">今天 08:00</div></div></div><div class="ncard-bd">☀️ 早安，今日要闻（3月10日）：<ul style="padding-left:16px;margin-top:6px"><li><b style="color:#6BA3F7">【科技】</b>OpenAI 发布 GPT-6</li><li><b style="color:#E8B040">【财经】</b>A 股半导体领涨</li><li><b style="color:#5EC090">【社会】</b>北京暴雨预警</li><li><b style="color:#60A5FA">【国际】</b>欧盟 AI 监管新框架</li></ul></div></div>
@@ -883,7 +879,7 @@ body {
     <div class="aurora purple"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">技能商城</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">技能商城</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="sk-banner"><h2>📦 技能商城</h2></div>
         <div class="sk-search">🔍 搜索技能...</div>
@@ -905,7 +901,7 @@ body {
     <div class="aurora cool"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">设备</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">设备</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="dev-card"><div class="dev-box"><div class="dev-led"></div></div><div class="dev-nm">客厅的 GoClaw</div><div class="dev-mdl">GoClaw Mini · GC-2026-A001</div><div class="dev-stats"><div><div class="dev-stat-v" style="color:#40C090">在线</div><div class="dev-stat-l">状态</div></div><div><div class="dev-stat-v">72h</div><div class="dev-stat-l">运行</div></div><div><div class="dev-stat-v">3</div><div class="dev-stat-l">技能</div></div></div></div>
         <div class="dev-actions"><div class="dev-sect-tt">设备操作</div><div class="dev-act" onclick="toast('已连接 Home_WiFi_5G')"><div class="dev-act-ic" style="background:rgba(80,130,220,0.06)">📡</div><div><div class="dev-act-nm">网络设置</div><div class="dev-act-desc">Home_WiFi_5G</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('v1.0.0 已是最新版本')"><div class="dev-act-ic" style="background:rgba(80,180,120,0.06)">🔄</div><div><div class="dev-act-nm">检查更新</div><div class="dev-act-desc">v1.0.0 · 已是最新</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('设备重启中...')"><div class="dev-act-ic" style="background:rgba(220,160,60,0.06)">🔁</div><div><div class="dev-act-nm">远程重启</div><div class="dev-act-desc">重启设备</div></div><span class="dev-act-arr">›</span></div><div class="dev-act" onclick="toast('⚠️ 请在设置中确认')"><div class="dev-act-ic" style="background:rgba(220,60,60,0.06)">⚠️</div><div><div class="dev-act-nm">恢复出厂</div><div class="dev-act-desc">清除所有数据</div></div><span class="dev-act-arr">›</span></div></div>
@@ -918,7 +914,7 @@ body {
     <div class="aurora purple"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="nav('chat')">←</div><div class="topbar-title">我的</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">我的</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div class="pf-av">🦞</div>
         <div class="pf-nm">GoClaw 用户</div>
@@ -939,7 +935,7 @@ body {
     <div class="aurora warm"></div>
     <div class="z">
       <div class="statusbar"><span>11:20</span><span>📶 🔋64</span></div>
-      <div class="topbar"><div class="topbar-icon" onclick="tab('profile')">←</div><div class="topbar-title">订阅管理</div><div style="width:44px"></div></div>
+      <div class="topbar"><div class="topbar-icon" onclick="openDrawer()" style="font-size:22px">☰</div><div class="topbar-title">订阅管理</div><div style="width:44px"></div></div>
       <div class="screen-body">
         <div style="padding:20px">
           <div class="usage-card"><div class="usage-lbl">今日用量</div><div class="usage-bar"><div class="usage-fill" style="width:72%"></div></div><div class="usage-row"><span>已用 72%</span><span>剩余 28%</span></div><div class="usage-warn">⚠️ 额度即将用完，升级解锁无限</div></div>
