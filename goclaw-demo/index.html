@@ -1274,6 +1274,28 @@ nav = function(id) { if(id==='notif') dismissCronDot(); _origNav(id); };
 const CLAWHUB_API = 'https://clawhub.ai/api/v1';
 let _allSkills = [], _hotSkills = [], _moreSkills = [];
 
+// Embedded fallback data (updated 2026-03-10)
+const _fallbackSkills = [
+{"slug":"zhipu-web-search","displayName":"zhipu web search","summary":"Zhipu AI Web Search Tool - Provides flexible search engine capabilities","stats":{"downloads":2554,"stars":3,"versions":7},"latestVersion":{"version":"1.0.6"}},
+{"slug":"release-manager","displayName":"Release Manager","summary":"Release Manager","stats":{"downloads":306,"stars":0,"versions":2},"latestVersion":{"version":"2.1.1"}},
+{"slug":"subagent-overseer","displayName":"Subagent Overseer","summary":"Monitor and manage spawned sub-agents lifecycle","stats":{"downloads":289,"stars":0,"versions":2},"latestVersion":{"version":"1.1.0"}},
+{"slug":"newsriver-intelligence","displayName":"NewsRiver Global Intelligence","summary":"Professional Quantitative Intelligence & DeFi Execution for AI Agents","stats":{"downloads":193,"stars":0,"versions":14},"latestVersion":{"version":"1.0.13"}},
+{"slug":"emergence","displayName":"Emergence Science Tools","summary":"Verifiable AI agent agreements protocol","stats":{"downloads":86,"stars":0,"versions":3},"latestVersion":{"version":"1.0.3"}},
+{"slug":"smart-model-router","displayName":"Model Router","summary":"Intelligent model task routing and optimization","stats":{"downloads":81,"stars":0,"versions":3},"latestVersion":{"version":"1.2.0"}},
+{"slug":"binance-coach","displayName":"BinanceCoach","summary":"AI-powered Binance crypto portfolio coaching","stats":{"downloads":51,"stars":0,"versions":15},"latestVersion":{"version":"1.1.5"}},
+{"slug":"demarkus","displayName":"Openclaw","summary":"Persistent agent memory over Mark Protocol","stats":{"downloads":26,"stars":0,"versions":3},"latestVersion":{"version":"1.1.0"}},
+{"slug":"finchain-skill","displayName":"finchain-skill","summary":"FinChain and FUSD finance Q&A generation","stats":{"downloads":19,"stars":0,"versions":2},"latestVersion":{"version":"1.0.1"}},
+{"slug":"clawlendar","displayName":"Clawlendar","summary":"Multi-calendar date conversion for AI agents","stats":{"downloads":4,"stars":0,"versions":2},"latestVersion":{"version":"0.3.1"}},
+{"slug":"openclaw-kindergarten","displayName":"OpenClaw Kindergarten","summary":"Manage agent skill night school enrollment","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"silmaril-cdp","displayName":"Silmaril Ranger","summary":"Browser automation and DOM inspection","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"news-publisher","displayName":"OpenClaw News Publisher","summary":"One-click multi-platform news publishing","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"nfc-tools","displayName":"NFC Tools","summary":"NFC tag discovery and write workflows","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"dkey-switch","displayName":"Dkey Switch","summary":"Quick window and tab switching commands","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"agent-superpowers","displayName":"Agent Superpowers","summary":"Verify agent execution results automatically","stats":{"downloads":0,"stars":0,"versions":2},"latestVersion":{"version":"1.1.0"}},
+{"slug":"pre-flight","displayName":"Pre-Flight by ICME","summary":"Authorization safety checks before agent actions","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.0"}},
+{"slug":"focus-ai","displayName":"focusAI","summary":"Screen activity monitoring and focus analysis","stats":{"downloads":0,"stars":0,"versions":1},"latestVersion":{"version":"1.0.2"}},
+];
+
 // Chinese translation map for known skills
 const zhNames = {
   'zhipu-web-search':'智谱搜索','release-manager':'发布管理','subagent-overseer':'子代理监控',
@@ -1332,19 +1354,21 @@ function renderListItem(s) {
     <button class="sk-btn get" onclick="event.stopPropagation();installSk(this)">安装</button></div>`;
 }
 
-async function loadSkills() {
-  try {
-    const r = await fetch(CLAWHUB_API+'/skills?limit=30');
-    const d = await r.json();
-    _allSkills = (d.items||[]).sort((a,b)=>(b.stats?.downloads||0)-(a.stats?.downloads||0));
-    _hotSkills = _allSkills.slice(0,10);
-    _moreSkills = _allSkills.slice(10);
-    document.getElementById('skHotScroll').innerHTML = _hotSkills.map(renderHotCard).join('');
-    document.getElementById('skMoreList').innerHTML = _moreSkills.map(renderListItem).join('');
-  } catch(e) {
-    // Fallback with cached data
-    document.getElementById('skHotScroll').innerHTML = '<div style="padding:20px;color:rgba(255,255,255,0.3);font-size:13px;">加载中…</div>';
-  }
+function renderSkillLists() {
+  _hotSkills = _allSkills.slice(0,10);
+  _moreSkills = _allSkills.slice(10);
+  document.getElementById('skHotScroll').innerHTML = _hotSkills.map(renderHotCard).join('');
+  document.getElementById('skMoreList').innerHTML = _moreSkills.map(renderListItem).join('');
+}
+function loadSkills() {
+  // Render fallback immediately
+  _allSkills = _fallbackSkills;
+  renderSkillLists();
+  // Try live update in background (non-blocking)
+  fetch(CLAWHUB_API+'/skills?limit=30').then(r=>r.json()).then(d=>{
+    const items = (d.items||[]).sort((a,b)=>(b.stats?.downloads||0)-(a.stats?.downloads||0));
+    if(items.length>0){ _allSkills=items; renderSkillLists(); }
+  }).catch(()=>{/* fallback already rendered */});
 }
 
 function filterSkills(q) {
